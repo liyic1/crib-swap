@@ -16,6 +16,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Column
+import androidx.compose.material3.Button
+import androidx.compose.ui.unit.dp
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,18 +28,28 @@ class MainActivity : ComponentActivity() {
             CribSwapTheme {
                 val filters = listOf("Distance", "Price", "Lease Term", "# of Beds", "# of Baths", "Amenities Included", "In-Unit Laundry")
                 var selectedFilters by remember { mutableStateOf(setOf("All")) }
-
-                Filter(
-                    filters = filters,
-                    selectedFilters = selectedFilters,
-                    onFilterSelected = { filter ->
-                        selectedFilters = if (filter in selectedFilters) {
-                            selectedFilters - filter
-                        } else {
-                            selectedFilters + filter
-                        }
+                var isFilterVisible by remember { mutableStateOf(false) }  // 👈 tracks open/closed
+                Column {
+                    Button(
+                        onClick = { isFilterVisible = !isFilterVisible },
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(if (isFilterVisible) "Hide Filters ▲" else "Filter ▼")
                     }
-                )
+                    AnimatedVisibility(visible = isFilterVisible) {
+                        Filter(
+                            filters = filters,
+                            selectedFilters = selectedFilters,
+                            onFilterSelected = { filter ->
+                                selectedFilters = if (filter in selectedFilters) {
+                                    selectedFilters - filter
+                                } else {
+                                    selectedFilters + filter
+                                }
+                            }
+                        )
+                    }
+                }
             }
         }
     }

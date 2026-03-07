@@ -1,4 +1,5 @@
 package com.example.cribswap
+
 import com.example.cribswap.ui.theme.Filter
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -20,6 +21,9 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Button
 import androidx.compose.ui.unit.dp
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material3.Icon
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,13 +32,16 @@ class MainActivity : ComponentActivity() {
             CribSwapTheme {
                 val filters = listOf("Distance", "Price", "Lease Term", "# of Beds", "# of Baths", "Amenities Included", "In-Unit Laundry")
                 var selectedFilters by remember { mutableStateOf(setOf("All")) }
-                var isFilterVisible by remember { mutableStateOf(false) }  // 👈 tracks open/closed
+                var isFilterVisible by remember { mutableStateOf(false) }
                 Column {
                     Button(
                         onClick = { isFilterVisible = !isFilterVisible },
                         modifier = Modifier.padding(16.dp)
                     ) {
-                        Text(if (isFilterVisible) "Hide Filters ▲" else "Filter ▼")
+                        Icon(
+                            imageVector = Icons.Default.FilterList,
+                            contentDescription = "Filter"
+                        )
                     }
                     AnimatedVisibility(visible = isFilterVisible) {
                         Filter(

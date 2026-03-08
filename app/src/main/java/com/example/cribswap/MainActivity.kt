@@ -13,6 +13,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.cribswap.ui.theme.CribSwapTheme
 
+import androidx.compose.material3.Button
+import androidx.compose.ui.modifier.modifierLocalConsumer
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,6 +27,7 @@ class MainActivity : ComponentActivity() {
                         name = "Android",
                         modifier = Modifier.padding(innerPadding)
                     )
+                    FilterButton()
                 }
             }
         }
@@ -37,6 +41,15 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
         modifier = modifier
     )
 }
+
+@Preview
+@Composable
+fun FilterButton() {
+    Button( onClick = { }) {
+        Text("Filter")
+    }
+}
+
 
 @Preview(showBackground = true)
 @Composable

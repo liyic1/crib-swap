@@ -14,6 +14,7 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -46,7 +47,14 @@ fun MainScreen(modifier: Modifier = Modifier) {
                         },
                         label = {
                             Text(text = navItem.label)
-                        }
+                        },
+                        colors = NavigationBarItemDefaults.colors(
+                            indicatorColor = Color(0xFF1A4F6E), // bubble shape behind selected button
+                            selectedIconColor = Color.White, // icon when selected
+                            unselectedIconColor = Color.White.copy(alpha = 0.6f), // when icon not selected
+                            selectedTextColor = Color.White, // text when selected
+                            unselectedTextColor = Color.White.copy(alpha = 0.6f) // when text not selected
+                        )
                     )
                 }
             }

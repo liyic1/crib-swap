@@ -19,6 +19,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             CribSwapTheme {
+                // Nav Bar Implementation
                 MainScreen()
             }
         }

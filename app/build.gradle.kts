@@ -5,6 +5,7 @@ plugins {
 
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.google.services)
+    alias(libs.plugins.google.firebase.crashlytics)
 }
 
 android {
@@ -50,6 +51,7 @@ dependencies {
 
     // Compose BOM (one source of truth for compose versions)
     implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.firebase.crashlytics)
     androidTestImplementation(platform(libs.androidx.compose.bom))
 
     // Compose UI

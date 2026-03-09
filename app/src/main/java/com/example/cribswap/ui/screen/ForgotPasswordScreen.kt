@@ -31,7 +31,6 @@ fun ForgotPasswordScreen(loginViewModel: LoginViewModel = viewModel()) {
     ) {
         Column(
             modifier = Modifier.fillMaxSize().padding(18.dp),
-//            verticalArrangement = Arrangement.Center
         ) {
             BackButton {
                 CribSwapAppRouter.navigateTo(Screen.LoginScreen)

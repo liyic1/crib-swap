@@ -1,6 +1,5 @@
 package com.example.cribswap.ui.screen
 
-import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.cribswap.R
@@ -73,28 +71,28 @@ fun SignUpScreen(signUpViewModel: SignUpViewModel = viewModel()) {
     }
 }
 
-@Preview
-@Composable
-fun DefaultPreviewOfSignUpScreen() {
-    Surface (
-        modifier = Modifier.fillMaxSize(),
-        color = Color.White
-    ) {
-        Crossfade(targetState = CribSwapAppRouter.currentScreen) { currentState ->
-            when (currentState.value) {
-                is Screen.SignUpScreen -> {
-                    SignUpScreen()
-                }
-                is Screen.LoginScreen -> {
-                    LoginScreen()
-                }
-
-                is Screen.ForgotPasswordScreen -> {
-                    ForgotPasswordScreen()
-                }
-
-            }
-
-        }
-    }
-}
+//@Preview
+//@Composable
+//fun DefaultPreviewOfSignUpScreen() {
+//    Surface (
+//        modifier = Modifier.fillMaxSize(),
+//        color = Color.White
+//    ) {
+//        Crossfade(targetState = CribSwapAppRouter.currentScreen) { currentState ->
+//            when (currentState.value) {
+//                is Screen.SignUpScreen -> {
+//                    SignUpScreen()
+//                }
+//                is Screen.LoginScreen -> {
+//                    LoginScreen()
+//                }
+//
+//                is Screen.ForgotPasswordScreen -> {
+//                    ForgotPasswordScreen()
+//                }
+//
+//            }
+//
+//        }
+//    }
+//}

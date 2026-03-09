@@ -1,5 +1,6 @@
 package com.example.cribswap.ui.screen
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -11,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.cribswap.R
@@ -22,11 +24,11 @@ import com.example.cribswap.ui.components.DividerTextComponent
 import com.example.cribswap.ui.components.MyTextField
 import com.example.cribswap.ui.components.NormalTextComponent
 import com.example.cribswap.ui.components.PasswordTextFieldComponent
-import com.example.cribswap.ui.components.UnderlinedTextComponent
-import com.example.cribswap.viewmodel.LoginViewModel
+import com.example.cribswap.ui.components.ReEnterPasswordTextFieldComponent
+import com.example.cribswap.viewmodel.SignUpViewModel
 
 @Composable
-fun LoginScreen(loginViewModel: LoginViewModel = viewModel()) {
+fun SignUpScreen(signUpViewModel: SignUpViewModel = viewModel()) {
     // Use androidx lifecycle viewModel(...)
 //    val loginViewModel = LoginViewModel()
 
@@ -38,36 +40,56 @@ fun LoginScreen(loginViewModel: LoginViewModel = viewModel()) {
             modifier = Modifier.fillMaxSize().padding(24.dp),
             verticalArrangement = Arrangement.Center
         ) {
-            NormalTextComponent("Welcome Back")
-            NormalTextComponent("Hello Again!")
+            NormalTextComponent("Sign Up")
+            NormalTextComponent("Join our verified student community")
             Spacer(modifier = Modifier.height(16.dp))
             MyTextField(
-                textValue = loginViewModel.email,
-                onValueChanged = { loginViewModel.email = it },
+                textValue = signUpViewModel.email,
+                onValueChanged = { signUpViewModel.email = it },
                 labelValue = "School Email",
                 painterResource = painterResource(id= R.drawable.email),
             )
             PasswordTextFieldComponent(
-                textValue = loginViewModel.password,
-                onValueChanged = { loginViewModel.password = it },
+                textValue = signUpViewModel.password,
+                onValueChanged = { signUpViewModel.password = it },
                 labelValue = "Password",
                 painterResource = painterResource(id= R.drawable.lock)
             )
-            Spacer(modifier = Modifier.height(8.dp))
-            UnderlinedTextComponent(value = "Forgot Passowrd?")
-            Spacer(modifier = Modifier.height(24.dp))
+            ReEnterPasswordTextFieldComponent(
+                textValue = signUpViewModel.reEnteredPassword,
+                onValueChanged = { signUpViewModel.reEnteredPassword = it },
+                labelValue = "Ren-enter Password",
+                painterResource = painterResource(id= R.drawable.lock)
+            )
+            Spacer(modifier = Modifier.height(40.dp))
 
-            ButtonComponent("Login")
+            ButtonComponent("Verify")
+            Spacer(modifier = Modifier.height(24.dp))
             DividerTextComponent()
-            ClickableLoginTextComponent(tryingToLogin = false, onTextSelected = {
-                CribSwapAppRouter.navigateTo(Screen.SignUpScreen)
+            ClickableLoginTextComponent(tryingToLogin = true, onTextSelected = {
+                CribSwapAppRouter.navigateTo(Screen.LoginScreen)
             })
         }
     }
 }
 
-//@Preview
-//@Composable
-//fun DefaultPreviewOfLoginScreen() {
-//    LoginScreen()
-//}
+@Preview
+@Composable
+fun DefaultPreviewOfSignUpScreen() {
+    Surface (
+        modifier = Modifier.fillMaxSize(),
+        color = Color.White
+    ) {
+        Crossfade(targetState = CribSwapAppRouter.currentScreen) { currentState ->
+            when (currentState.value) {
+                is Screen.SignUpScreen -> {
+                    SignUpScreen()
+                }
+                is Screen.LoginScreen -> {
+                LoginScreen()
+                }
+            }
+
+        }
+    }
+}

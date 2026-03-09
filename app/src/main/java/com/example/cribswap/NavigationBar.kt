@@ -22,7 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 
 @Composable
-fun MainScreen(modifier: Modifier = Modifier) {
+fun NavigationBar(modifier: Modifier = Modifier) {
     val NavItemList = listOf(
         NavItem("Home", Icons.Default.Home),
         NavItem("Saved", Icons.Default.Favorite),
@@ -67,7 +67,7 @@ fun MainScreen(modifier: Modifier = Modifier) {
 @Composable
 fun ContentScreen(modifier: Modifier = Modifier, selectedIndex: Int) {
     when (selectedIndex) {
-        // TODO: Replace Pages Here with Corresponding Pages
+        // TODO: Replace Pages Here
         0 -> Home(modifier = modifier)
         1 -> Saved(modifier = modifier)
         2 -> Chat(modifier = modifier)

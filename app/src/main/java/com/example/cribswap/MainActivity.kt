@@ -20,7 +20,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             CribSwapTheme {
                 // Nav Bar Implementation
-                MainScreen()
+                NavigationBar()
             }
         }
     }

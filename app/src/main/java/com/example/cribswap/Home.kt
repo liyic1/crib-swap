@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun Home(modifier: Modifier = Modifier) {
     Column (
-        modifier = Modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize()
             .background(Color(0xFFE8F3F8)),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally

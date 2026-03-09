@@ -16,15 +16,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun Home(modifier: Modifier = Modifier) {
+fun Profile(modifier: Modifier = Modifier) {
     Column (
         modifier = Modifier.fillMaxSize()
             .background(Color(0xFFE8F3F8)),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Text(
-            text = "Home/Listings Page",
+            text = "Profile Page",
             fontSize = 40.sp,
             fontWeight = FontWeight.SemiBold,
             color = Color(0xFF1E4F6A)

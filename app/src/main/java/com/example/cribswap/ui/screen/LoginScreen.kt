@@ -54,7 +54,9 @@ fun LoginScreen(loginViewModel: LoginViewModel = viewModel()) {
                 painterResource = painterResource(id= R.drawable.lock)
             )
             Spacer(modifier = Modifier.height(8.dp))
-            UnderlinedTextComponent(value = "Forgot Passowrd?")
+            UnderlinedTextComponent(value = "Forgot Password?", onTextSelected = {
+                CribSwapAppRouter.navigateTo(Screen.ForgotPasswordScreen)
+            })
             Spacer(modifier = Modifier.height(24.dp))
 
             ButtonComponent("Login")

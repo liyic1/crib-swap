@@ -86,8 +86,13 @@ fun DefaultPreviewOfSignUpScreen() {
                     SignUpScreen()
                 }
                 is Screen.LoginScreen -> {
-                LoginScreen()
+                    LoginScreen()
                 }
+
+                is Screen.ForgotPasswordScreen -> {
+                    ForgotPasswordScreen()
+                }
+
             }
 
         }

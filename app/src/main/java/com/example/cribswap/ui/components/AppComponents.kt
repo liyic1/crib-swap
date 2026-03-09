@@ -1,15 +1,20 @@
 package com.example.cribswap.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -244,10 +249,10 @@ fun ClickableLoginTextComponent(tryingToLogin:Boolean = true, onTextSelected: (S
 }
 
 @Composable
-fun UnderlinedTextComponent(value: String) {
+fun UnderlinedTextComponent(value: String, onTextSelected: (String) -> Unit) {
     Text(
         text = value,
-        modifier = Modifier.fillMaxWidth().heightIn(min = 80.dp),
+        modifier = Modifier.fillMaxWidth().heightIn(min = 80.dp).clickable { onTextSelected(value) },
         style = TextStyle(
             fontSize = 18.sp,
             fontWeight = FontWeight.Medium,
@@ -257,4 +262,23 @@ fun UnderlinedTextComponent(value: String) {
         textAlign = TextAlign.Right,
         textDecoration = TextDecoration.Underline
     )
+}
+
+@Composable
+fun BackButton(
+    onBackClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .size(44.dp)
+            .background(Color.LightGray, CircleShape)
+            .clickable { onBackClick() },
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            imageVector = Icons.Default.ArrowBack,
+            contentDescription = "Back",
+            modifier = Modifier.size(20.dp)
+        )
+    }
 }

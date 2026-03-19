@@ -1,4 +1,4 @@
-package com.example.cribswap
+package com.example.cribswap.ui.theme.navigation
 
 import androidx.compose.ui.graphics.vector.ImageVector
 

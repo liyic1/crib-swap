@@ -1,4 +1,4 @@
-package com.example.cribswap
+package com.example.cribswap.ui.theme.navigation
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -20,6 +20,11 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
+import com.example.cribswap.Chat
+import com.example.cribswap.Home
+import com.example.cribswap.ui.theme.navigation.NavItem
+import com.example.cribswap.Profile
+import com.example.cribswap.Saved
 
 @Composable
 fun NavigationBar(modifier: Modifier = Modifier) {

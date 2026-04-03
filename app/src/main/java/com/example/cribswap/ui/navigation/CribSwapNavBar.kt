@@ -1,4 +1,4 @@
-package com.example.cribswap.ui.theme.navigation
+package com.example.cribswap.ui.navigation
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -20,28 +20,27 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
-import com.example.cribswap.Chat
-import com.example.cribswap.Home
-import com.example.cribswap.ui.theme.navigation.NavItem
-import com.example.cribswap.Profile
-import com.example.cribswap.Saved
+import com.example.cribswap.ui.Chat
+import com.example.cribswap.ui.Home
+import com.example.cribswap.ui.Profile
+import com.example.cribswap.ui.Saved
 
+private val navItemList = listOf(
+    NavItem("Home", Icons.Default.Home),
+    NavItem("Saved", Icons.Default.Favorite),
+    NavItem("Chat", Icons.Default.Create),
+    NavItem("Profile", Icons.Default.Face)
+)
 @Composable
-fun NavigationBar(modifier: Modifier = Modifier) {
-    val NavItemList = listOf(
-        NavItem("Home", Icons.Default.Home),
-        NavItem("Saved", Icons.Default.Favorite),
-        NavItem("Chat", Icons.Default.Create),
-        NavItem("Profile", Icons.Default.Face)
-    )
+fun CribSwapNavBar(modifier: Modifier = Modifier) {
     var selectedIndex by remember {
         mutableIntStateOf(0)
     }
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         bottomBar = {
             NavigationBar (containerColor = Color(0xFF2D6E8F)) {
-                NavItemList.forEachIndexed { index, navItem ->
+                navItemList.forEachIndexed { index, navItem ->
                     NavigationBarItem(
                         selected = selectedIndex == index,
                         onClick = {
@@ -70,11 +69,12 @@ fun NavigationBar(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun ContentScreen(modifier: Modifier = Modifier, selectedIndex: Int) {
+private fun ContentScreen(modifier: Modifier = Modifier, selectedIndex: Int) {
     when (selectedIndex) {
         0 -> Home(modifier = modifier)
         1 -> Saved(modifier = modifier)
         2 -> Chat(modifier = modifier)
         3 -> Profile(modifier = modifier)
+        else -> Home(modifier = modifier)
     }
 }

@@ -5,7 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.example.cribswap.ui.theme.CribSwapTheme
-import com.example.cribswap.ui.theme.navigation.NavigationBar
+import com.example.cribswap.ui.navigation.CribSwapNavBar
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -14,7 +14,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             CribSwapTheme {
                 // Nav Bar Implementation
-                NavigationBar()
+                CribSwapNavBar()
             }
         }
     }

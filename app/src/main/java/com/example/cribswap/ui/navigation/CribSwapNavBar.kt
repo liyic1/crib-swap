@@ -1,5 +1,6 @@
 package com.example.cribswap.ui.navigation
 
+
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -19,11 +20,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.Color
 import com.example.cribswap.ui.Chat
 import com.example.cribswap.ui.Home
 import com.example.cribswap.ui.Profile
 import com.example.cribswap.ui.Saved
+import com.example.cribswap.ui.theme.NavBarBackground
+import com.example.cribswap.ui.theme.NavBarContentSelected
+import com.example.cribswap.ui.theme.NavBarContentUnselected
+import com.example.cribswap.ui.theme.NavBarIndicator
 
 private val navItemList = listOf(
     NavItem("Home", Icons.Default.Home),
@@ -31,6 +35,7 @@ private val navItemList = listOf(
     NavItem("Chat", Icons.Default.Create),
     NavItem("Profile", Icons.Default.Face)
 )
+
 @Composable
 fun CribSwapNavBar(modifier: Modifier = Modifier) {
     var selectedIndex by remember {
@@ -39,25 +44,23 @@ fun CribSwapNavBar(modifier: Modifier = Modifier) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
         bottomBar = {
-            NavigationBar (containerColor = Color(0xFF2D6E8F)) {
+            NavigationBar(containerColor = NavBarBackground) {
                 navItemList.forEachIndexed { index, navItem ->
                     NavigationBarItem(
                         selected = selectedIndex == index,
-                        onClick = {
-                            selectedIndex = index
-                        },
+                        onClick = { selectedIndex = index },
                         icon = {
-                            Icon(imageVector = navItem.icon, contentDescription = "Icon")
+                            Icon(imageVector = navItem.icon, contentDescription = navItem.label)
                         },
                         label = {
                             Text(text = navItem.label)
                         },
                         colors = NavigationBarItemDefaults.colors(
-                            indicatorColor = Color(0xFF1A4F6E), // bubble shape behind selected button
-                            selectedIconColor = Color.White, // icon when selected
-                            unselectedIconColor = Color.White.copy(alpha = 0.6f), // when icon not selected
-                            selectedTextColor = Color.White, // text when selected
-                            unselectedTextColor = Color.White.copy(alpha = 0.6f) // when text not selected
+                            indicatorColor = NavBarIndicator,
+                            selectedIconColor = NavBarContentSelected,
+                            unselectedIconColor = NavBarContentUnselected,
+                            selectedTextColor = NavBarContentSelected,
+                            unselectedTextColor = NavBarContentUnselected
                         )
                     )
                 }

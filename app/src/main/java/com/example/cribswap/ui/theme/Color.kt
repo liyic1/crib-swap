@@ -2,6 +2,11 @@ package com.example.cribswap.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
+val NavBarBackground = Color(0xFF2D6E8F)
+val NavBarIndicator = Color(0xFF1A4F6E)
+val NavBarContentSelected = Color.White
+val NavBarContentUnselected = Color.White.copy(alpha = 0.6f)
+
 val Purple80 = Color(0xFFD0BCFF)
 val PurpleGrey80 = Color(0xFFCCC2DC)
 val Pink80 = Color(0xFFEFB8C8)

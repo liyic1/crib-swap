@@ -1,4 +1,4 @@
-package com.example.cribswap.ui.filter  // ← was ui.onboarding
+package com.example.cribswap.ui.filter
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -26,7 +26,6 @@ import com.example.cribswap.ui.theme.DividerColor
 import com.example.cribswap.ui.theme.SurfaceLight
 import com.example.cribswap.ui.theme.TextPrimary
 import com.example.cribswap.ui.theme.TextSecondary
-// ↑ no more import for onboarding package — everything is in ui.filter now
 
 @Composable
 fun PreferencesScreen(
@@ -40,7 +39,6 @@ fun PreferencesScreen(
             .fillMaxSize()
             .background(SurfaceLight)
     ) {
-        // Header
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -57,7 +55,6 @@ fun PreferencesScreen(
             }
         }
 
-        // Form
         Column(
             modifier = Modifier
                 .weight(1f)
@@ -65,7 +62,6 @@ fun PreferencesScreen(
                 .padding(horizontal = 24.dp, vertical = 20.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            // Price Range
             PrefsSection(
                 title = "Price Range",
                 subtitle = "What is your ideal rent price?"
@@ -97,7 +93,6 @@ fun PreferencesScreen(
 
             HorizontalDivider(color = DividerColor)
 
-            // Location
             PrefsSection(
                 title = "Location",
                 subtitle = "Where are you looking to live?"
@@ -146,7 +141,6 @@ fun PreferencesScreen(
 
             HorizontalDivider(color = DividerColor)
 
-            // Lease Term
             PrefsSection(
                 title = "Lease Term",
                 subtitle = "How long do you plan to stay?"
@@ -185,7 +179,6 @@ fun PreferencesScreen(
             Spacer(Modifier.height(8.dp))
         }
 
-        // Get Started — pinned to bottom
         HorizontalDivider(color = DividerColor)
         Box(
             Modifier
@@ -199,13 +192,12 @@ fun PreferencesScreen(
                 shape = RoundedCornerShape(14.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = CribSwapBlue)
             ) {
-                Text("Get Started", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text("Continue", fontSize = 16.sp, fontWeight = FontWeight.Bold)
             }
         }
     }
 }
 
-// ── Private helpers ───────────────────────────────────────────────────────────
 
 @Composable
 private fun PrefsSection(

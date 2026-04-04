@@ -1,19 +1,23 @@
 package com.example.cribswap.ui.screen
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.cribswap.R
+import com.example.cribswap.data.SignUpUIEvent
 import com.example.cribswap.navigation.CribSwapAppRouter
 import com.example.cribswap.navigation.Screen
 import com.example.cribswap.ui.components.ButtonComponent
@@ -27,72 +31,56 @@ import com.example.cribswap.viewmodel.SignUpViewModel
 
 @Composable
 fun SignUpScreen(signUpViewModel: SignUpViewModel = viewModel()) {
-    // Use androidx lifecycle viewModel(...)
-//    val loginViewModel = LoginViewModel()
-
-    Surface(
-        color = Color.White,
-        modifier = Modifier.fillMaxSize().padding(28.dp)
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize().padding(24.dp),
-            verticalArrangement = Arrangement.Center
+    Box(modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center) {
+        Surface(
+            color = Color.White,
+            modifier = Modifier.fillMaxSize().padding(28.dp)
         ) {
-            NormalTextComponent("Sign Up")
-            NormalTextComponent("Join our verified student community")
-            Spacer(modifier = Modifier.height(16.dp))
-            MyTextField(
-                textValue = signUpViewModel.email,
-                onValueChanged = { signUpViewModel.email = it },
-                labelValue = "School Email",
-                painterResource = painterResource(id= R.drawable.email),
-            )
-            PasswordTextFieldComponent(
-                textValue = signUpViewModel.password,
-                onValueChanged = { signUpViewModel.password = it },
-                labelValue = "Password",
-                painterResource = painterResource(id= R.drawable.lock)
-            )
-            ReEnterPasswordTextFieldComponent(
-                textValue = signUpViewModel.reEnteredPassword,
-                onValueChanged = { signUpViewModel.reEnteredPassword = it },
-                labelValue = "Ren-enter Password",
-                painterResource = painterResource(id= R.drawable.lock)
-            )
-            Spacer(modifier = Modifier.height(40.dp))
+            Column(
+                modifier = Modifier.fillMaxSize().padding(24.dp),
+                verticalArrangement = Arrangement.Center
+            ) {
+                NormalTextComponent("Sign Up")
+                NormalTextComponent("Join our verified student community")
+                Spacer(modifier = Modifier.height(16.dp))
+                MyTextField(
+                    labelValue = "School Email",
+                    painterResource = painterResource(id= R.drawable.email),
+                    onTextSelected = { signUpViewModel.onEvent(SignUpUIEvent.EmailChanged(it))  },
+                    errorStatus = signUpViewModel.registrationUIState.value.emailError
+                )
+                PasswordTextFieldComponent(
+                    onTextSelected = { signUpViewModel.onEvent(SignUpUIEvent.PasswordChanged(it)) },
+                    labelValue = "Password",
+                    painterResource = painterResource(id= R.drawable.lock),
+                    errorStatus = signUpViewModel.registrationUIState.value.passwordError
+                )
+                ReEnterPasswordTextFieldComponent(
+                    onTextSelected = { signUpViewModel.onEvent(SignUpUIEvent.ReEnterPasswordChanged(it))  },
+                    labelValue = "Ren-enter Password",
+                    painterResource = painterResource(id= R.drawable.lock),
+                    errorStatus = signUpViewModel.registrationUIState.value.passwordError
+                )
+                Spacer(modifier = Modifier.height(40.dp))
 
-            ButtonComponent("Verify")
-            Spacer(modifier = Modifier.height(24.dp))
-            DividerTextComponent()
-            ClickableLoginTextComponent(tryingToLogin = true, onTextSelected = {
-                CribSwapAppRouter.navigateTo(Screen.LoginScreen)
-            })
+                ButtonComponent(
+                    value = "Verify",
+                    onButtonClicked = {
+                        signUpViewModel.onEvent(SignUpUIEvent.RegisterButtonClicked)
+                    },
+                    isEnabled = signUpViewModel.allValidatorPassed.value
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+                DividerTextComponent()
+                ClickableLoginTextComponent(tryingToLogin = true, onTextSelected = {
+                    CribSwapAppRouter.navigateTo(Screen.LoginScreen)
+                })
+            }
         }
+        if (signUpViewModel.signUpInProgress.value) {
+            CircularProgressIndicator()
+        }
+
     }
 }
-
-//@Preview
-//@Composable
-//fun DefaultPreviewOfSignUpScreen() {
-//    Surface (
-//        modifier = Modifier.fillMaxSize(),
-//        color = Color.White
-//    ) {
-//        Crossfade(targetState = CribSwapAppRouter.currentScreen) { currentState ->
-//            when (currentState.value) {
-//                is Screen.SignUpScreen -> {
-//                    SignUpScreen()
-//                }
-//                is Screen.LoginScreen -> {
-//                    LoginScreen()
-//                }
-//
-//                is Screen.ForgotPasswordScreen -> {
-//                    ForgotPasswordScreen()
-//                }
-//
-//            }
-//
-//        }
-//    }
-//}

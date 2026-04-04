@@ -129,6 +129,10 @@ fun DefaultPreviewOfProfileScreen() {
                 is Screen.ForgotPasswordScreen -> {
                     ForgotPasswordScreen()
                 }
+
+                is Screen.HomeScreen -> {
+                    HomeScreen()
+                }
             }
 
         }

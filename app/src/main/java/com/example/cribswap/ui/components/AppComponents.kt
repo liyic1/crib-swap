@@ -37,6 +37,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -60,7 +61,9 @@ import com.example.cribswap.ui.theme.Primary
 fun NormalTextComponent(value: String) {
     Text(
         text = value,
-        modifier = Modifier.fillMaxWidth().heightIn(min = 80.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 80.dp),
         style = TextStyle(
             fontSize = 18.sp,
             fontWeight = FontWeight.Medium,
@@ -75,13 +78,15 @@ fun NormalTextComponent(value: String) {
 fun MyTextField(
     labelValue:String,
     painterResource: Painter,
-    textValue:String,
-    onValueChanged: (String) -> Unit,
-) {
+    onTextSelected: (String) -> Unit,
+    errorStatus: Boolean = false)
+{
+    val textValue = remember { mutableStateOf("")}
+    val localFocusManager = LocalFocusManager.current
     OutlinedTextField(
         modifier = Modifier.fillMaxWidth(),
         label = { Text(text = labelValue) },
-        value = textValue,
+        value = textValue.value,
         colors = TextFieldDefaults.colors(
             focusedIndicatorColor = Primary,
             focusedLabelColor = Primary,
@@ -90,19 +95,28 @@ fun MyTextField(
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
         singleLine = true,
         maxLines = 1,
-        onValueChange = onValueChanged,
+        onValueChange = {
+            textValue.value = it
+                        onTextSelected(it)
+        },
         leadingIcon = {
             Icon(painter = painterResource, contentDescription = "")
-        }
+        },
+        isError = !errorStatus
     )
+
 }
 
 @Composable
 fun PasswordTextFieldComponent(
     labelValue:String,
     painterResource: Painter,
-    textValue: String,
-    onValueChanged: (String) -> Unit) {
+    onTextSelected: (String) -> Unit,
+    errorStatus: Boolean = false)
+{
+    val localFocusManager = LocalFocusManager.current
+
+    val password = remember { mutableStateOf("")}
 
     val passwordVisible = remember {
         mutableStateOf(false)
@@ -119,8 +133,11 @@ fun PasswordTextFieldComponent(
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
         singleLine = true,
         maxLines = 1,
-        value = textValue,
-        onValueChange = onValueChanged,
+        value = password.value,
+        onValueChange = {
+            password.value = it
+            onTextSelected(it)
+        },
         leadingIcon = {
             Icon(painter = painterResource, contentDescription = "")
         },
@@ -136,7 +153,8 @@ fun PasswordTextFieldComponent(
             }
 
         },
-        visualTransformation = if(passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation()
+        visualTransformation = if(passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
+        isError = !errorStatus
     )
 }
 
@@ -144,8 +162,12 @@ fun PasswordTextFieldComponent(
 fun ReEnterPasswordTextFieldComponent(
     labelValue:String,
     painterResource: Painter,
-    textValue: String,
-    onValueChanged: (String) -> Unit) {
+    onTextSelected: (String) -> Unit,
+    errorStatus: Boolean = false)
+{
+    val localFocusManager = LocalFocusManager.current
+
+    val password = remember { mutableStateOf("")}
 
     val passwordVisible = remember {
         mutableStateOf(false)
@@ -162,8 +184,11 @@ fun ReEnterPasswordTextFieldComponent(
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
         singleLine = true,
         maxLines = 1,
-        value = textValue,
-        onValueChange = onValueChanged,
+        value = password.value,
+        onValueChange = {
+            password.value = it
+            onTextSelected(it)
+        },
         leadingIcon = {
             Icon(painter = painterResource, contentDescription = "")
         },
@@ -179,20 +204,25 @@ fun ReEnterPasswordTextFieldComponent(
             }
 
         },
-        visualTransformation = if(passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation()
+        visualTransformation = if(passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
+        isError = !errorStatus
     )
 }
 
 @Composable
-fun ButtonComponent(value: String) {
-    Button(onClick = { /*ToDO*/ },
-        modifier = Modifier.fillMaxWidth().heightIn(48.dp),
+fun ButtonComponent(value: String, onButtonClicked : () -> Unit, isEnabled : Boolean = false) {
+    Button(onClick = { onButtonClicked() },
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(48.dp),
         contentPadding = PaddingValues(),
-        colors = ButtonDefaults.buttonColors(Color.Transparent)
+        colors = ButtonDefaults.buttonColors(Color.Transparent),
+        enabled = isEnabled
     ) {
         Box(modifier = Modifier
             .fillMaxWidth()
-            .heightIn(48.dp).background(
+            .heightIn(48.dp)
+            .background(
                 brush = Brush.horizontalGradient(listOf(Primary, Primary)),
                 shape = RoundedCornerShape(50.dp)
             ),
@@ -237,7 +267,9 @@ fun ClickableLoginTextComponent(tryingToLogin:Boolean = true, onTextSelected: (S
     }
 
     ClickableText(
-        modifier = Modifier.fillMaxWidth().heightIn(min = 80.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 80.dp),
         style = TextStyle(
             fontSize = 21.sp,
             fontWeight = FontWeight.Medium,
@@ -258,7 +290,10 @@ fun ClickableLoginTextComponent(tryingToLogin:Boolean = true, onTextSelected: (S
 fun UnderlinedTextComponent(value: String, onTextSelected: (String) -> Unit) {
     Text(
         text = value,
-        modifier = Modifier.fillMaxWidth().heightIn(min = 80.dp).clickable { onTextSelected(value) },
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 80.dp)
+            .clickable { onTextSelected(value) },
         style = TextStyle(
             fontSize = 18.sp,
             fontWeight = FontWeight.Medium,

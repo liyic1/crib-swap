@@ -10,12 +10,13 @@ sealed class Screen {
     object ProfileScreen : Screen()
     object SettingsScreen : Screen()
     object PersonalDetailScreen : Screen()
+    object HomeScreen : Screen()
 }
 
 object CribSwapAppRouter {
 
     var currentScreen: MutableState<Screen> =
-        mutableStateOf(Screen.ProfileScreen)
+        mutableStateOf(Screen.LoginScreen)
 
     fun navigateTo(destination: Screen) {
         currentScreen.value = destination

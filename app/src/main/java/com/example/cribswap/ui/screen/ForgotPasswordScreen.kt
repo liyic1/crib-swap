@@ -13,6 +13,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.cribswap.R
+import com.example.cribswap.data.LoginUIEvent
 import com.example.cribswap.navigation.CribSwapAppRouter
 import com.example.cribswap.navigation.Screen
 import com.example.cribswap.ui.components.BackButton
@@ -38,14 +39,18 @@ fun ForgotPasswordScreen(loginViewModel: LoginViewModel = viewModel()) {
             NormalTextComponent("Forgot Password")
             NormalTextComponent("Please enter your email to reset the password")
             MyTextField(
-                textValue = loginViewModel.email,
-                onValueChanged = { loginViewModel.email = it },
+                onTextSelected = {  loginViewModel.onEvent(LoginUIEvent.EmailChanged(it)) },
                 labelValue = "Enter your email",
                 painterResource = painterResource(id= R.drawable.email),
             )
             Spacer(modifier = Modifier.height(30.dp))
 
-            ButtonComponent("Reset Password")
+            ButtonComponent(
+                value = "Reset Password",
+                onButtonClicked = {
+                loginViewModel.onEvent(LoginUIEvent.LoginButtonClicked)
+                },
+                isEnabled = loginViewModel.allValidatorPassed.value)
         }
     }
 }

@@ -27,7 +27,6 @@ fun Home(
 
     Box(modifier = modifier.fillMaxSize()) {
 
-        // Top bar with filter button
         Row(
             Modifier
                 .fillMaxWidth()
@@ -51,7 +50,6 @@ fun Home(
             }
         }
 
-        // Filter sheet overlays the page
         if (showFilter) {
             FilterBottomSheet(
                 onDismiss = { showFilter = false },

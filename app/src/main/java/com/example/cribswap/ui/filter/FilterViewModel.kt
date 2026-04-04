@@ -13,11 +13,9 @@ class FilterViewModel : ViewModel() {
     private val defaultState: FilterState
         get() = FilterState(leaseStartYear = currentYear, leaseEndYear = currentYear)
 
-    // Draft = what the user is editing inside the sheet
     private val _draft = MutableStateFlow(defaultState)
     val draft: StateFlow<FilterState> = _draft.asStateFlow()
 
-    // Applied = filters actually being used by the listings screen
     private val _applied = MutableStateFlow(defaultState)
     val applied: StateFlow<FilterState> = _applied.asStateFlow()
 

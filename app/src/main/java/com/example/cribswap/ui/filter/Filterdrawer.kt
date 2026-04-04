@@ -25,7 +25,6 @@ import com.example.cribswap.ui.theme.SurfaceLight
 import com.example.cribswap.ui.theme.TextPrimary
 import com.example.cribswap.ui.theme.TextSecondary
 
-// toggle stays here until a second file needs it
 private fun <T> List<T>.toggle(item: T): List<T> =
     if (contains(item)) this - item else this + item
 
@@ -51,7 +50,6 @@ fun FilterBottomSheet(
     ) {
         Column(Modifier.fillMaxWidth()) {
 
-            // Header
             Box(
                 Modifier
                     .fillMaxWidth()
@@ -72,7 +70,6 @@ fun FilterBottomSheet(
                 )
             }
 
-            // Scrollable filters
             Column(
                 Modifier
                     .fillMaxWidth()
@@ -81,7 +78,6 @@ fun FilterBottomSheet(
                     .padding(horizontal = 20.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                // Price
                 FilterSection("Price Range") {
                     Box(Modifier.fillMaxWidth().height(22.dp)) {
                         Text(
@@ -106,7 +102,6 @@ fun FilterBottomSheet(
 
                 FilterDivider()
 
-                // Location
                 FilterSection("Location") {
                     OutlinedTextField(
                         value = draft.locationQuery,
@@ -144,7 +139,6 @@ fun FilterBottomSheet(
 
                 FilterDivider()
 
-                // Bedrooms
                 FilterSection("Bedrooms") {
                     SelectionButtonRow(
                         options = listOf("Studio", "1", "2", "3", "4+"),
@@ -155,7 +149,6 @@ fun FilterBottomSheet(
 
                 FilterDivider()
 
-                // Bathrooms
                 FilterSection("Bathrooms") {
                     SelectionButtonRow(
                         options = listOf("0.5", "1", "1.5", "2", "2.5", "3+"),
@@ -166,7 +159,6 @@ fun FilterBottomSheet(
 
                 FilterDivider()
 
-                // Roommates
                 FilterSection("Roommates") {
                     SelectionButtonRow(
                         options = listOf("0", "1", "2", "3", "4+"),
@@ -177,7 +169,6 @@ fun FilterBottomSheet(
 
                 FilterDivider()
 
-                // Lease Term
                 FilterSection("Lease Term") {
                     Text("Start", fontSize = 12.sp, color = TextSecondary, fontWeight = FontWeight.Medium)
                     Spacer(Modifier.height(6.dp))
@@ -208,7 +199,6 @@ fun FilterBottomSheet(
 
                 FilterDivider()
 
-                // Building Type
                 FilterSection("Building Type") {
                     listOf("Apartment", "Condo", "House").forEach { type ->
                         Row(
@@ -235,7 +225,6 @@ fun FilterBottomSheet(
 
                 FilterDivider()
 
-                // Amenities
                 FilterSection("Amenities") {
                     ToggleRow("Furnished", draft.furnished) {
                         viewModel.updateDraft { copy(furnished = it) }
@@ -254,7 +243,6 @@ fun FilterBottomSheet(
                 Spacer(Modifier.height(8.dp))
             }
 
-            // Reset / Apply
             HorizontalDivider(color = DividerColor)
             Row(
                 Modifier
@@ -285,7 +273,6 @@ fun FilterBottomSheet(
     }
 }
 
-// ── Private helper composables ────────────────────────────────────────────────
 
 @Composable
 private fun FilterSection(title: String, content: @Composable ColumnScope.() -> Unit) {

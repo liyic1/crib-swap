@@ -1,4 +1,4 @@
-package com.example.cribswap
+package com.example.cribswap.ui.filter
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.cribswap.ui.theme.CribSwapBlue
 import com.example.cribswap.ui.theme.CribSwapBlueLight
+import java.util.Calendar
 
 // CribSwap Colors
 private val Accent         = CribSwapBlue
@@ -32,6 +33,8 @@ private val ButtonUnselected = CribSwapBlueLight
 
 private fun <T> MutableList<T>.toggle(item: T) =
     if (contains(item)) remove(item) else add(item)
+private val currentYear: Int
+    get() = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR)
 
 @OptIn(ExperimentalMaterial3Api::class) // Need for using ModalBottomSheet
 @Composable
@@ -40,7 +43,6 @@ fun FilterBottomSheet(onDismiss: () -> Unit) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     // Filter Vars and Vals
 
-    val currentYear = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR)
     var priceMin by remember { mutableFloatStateOf(0f) }
     var priceMax by remember { mutableFloatStateOf(3000f) }
     var locationQuery by remember { mutableStateOf("") }

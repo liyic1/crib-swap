@@ -3,6 +3,10 @@ import androidx.compose.ui.graphics.Color
 val CribSwapBlue   = Color(0xFF2D6E8F)
 val CribSwapBlueDark  = Color(0xFF1E4F6A)
 val CribSwapBlueLight = Color(0xFFE8F3F8)
+val SurfaceLight  = Color(0xFFF5F9FB)
+val DividerColor  = Color(0xFFD6E6EE)
+val TextPrimary   = Color(0xFF0F2A38)
+val TextSecondary = Color(0xFF5A7A8A)
 
 val Purple80 = Color(0xFFD0BCFF)
 val PurpleGrey80 = Color(0xFFCCC2DC)

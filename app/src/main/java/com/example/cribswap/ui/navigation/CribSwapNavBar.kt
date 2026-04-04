@@ -42,7 +42,6 @@ fun CribSwapNavBar(
     modifier: Modifier = Modifier,
     filterViewModel: FilterViewModel = viewModel()
 ) {
-    val filterViewModel: FilterViewModel = viewModel()
     var selectedIndex by remember { mutableIntStateOf(0) }
 
     Scaffold(

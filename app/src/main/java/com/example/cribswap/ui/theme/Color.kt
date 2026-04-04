@@ -8,6 +8,11 @@ val DividerColor  = Color(0xFFD6E6EE)
 val TextPrimary   = Color(0xFF0F2A38)
 val TextSecondary = Color(0xFF5A7A8A)
 
+val NavBarBackground = Color(0xFF2D6E8F)
+val NavBarIndicator = Color(0xFF1A4F6E)
+val NavBarContentSelected = Color.White
+val NavBarContentUnselected = Color.White.copy(alpha = 0.6f)
+
 val Purple80 = Color(0xFFD0BCFF)
 val PurpleGrey80 = Color(0xFFCCC2DC)
 val Pink80 = Color(0xFFEFB8C8)

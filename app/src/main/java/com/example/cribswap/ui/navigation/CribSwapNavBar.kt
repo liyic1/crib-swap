@@ -72,7 +72,10 @@ fun CribSwapNavBar(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun ContentScreen(modifier: Modifier = Modifier, selectedIndex: Int) {
+private fun ContentScreen(
+    modifier: Modifier = Modifier,
+    selectedIndex: Int,
+    filterViewModel: FilterViewModel) {
     when (selectedIndex) {
         0 -> Home(modifier = modifier)
         1 -> Saved(modifier = modifier)

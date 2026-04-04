@@ -38,7 +38,10 @@ private val navItemList = listOf(
 )
 
 @Composable
-fun CribSwapNavBar(modifier: Modifier = Modifier) {
+fun CribSwapNavBar(
+    modifier: Modifier = Modifier,
+    filterViewModel: FilterViewModel = viewModel()
+) {
     val filterViewModel: FilterViewModel = viewModel()
     var selectedIndex by remember { mutableIntStateOf(0) }
 

@@ -30,4 +30,8 @@ class FilterViewModel : ViewModel() {
     fun resetFilters() {
         _draft.value = defaultState
     }
+    fun applyPreferences(state: FilterState) {
+        _draft.value = state
+        _applied.value = state
+    }
 }

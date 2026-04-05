@@ -28,10 +28,6 @@ import com.example.cribswap.ui.theme.TextSecondary
 private fun <T> List<T>.toggle(item: T): List<T> =
     if (contains(item)) this - item else this + item
 
-private val Accent           = CribSwapBlue
-private val ButtonSelected   = CribSwapBlue
-private val ButtonUnselected = CribSwapBlueLight
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilterBottomSheet(
@@ -53,7 +49,7 @@ fun FilterBottomSheet(
             Box(
                 Modifier
                     .fillMaxWidth()
-                    .background(Accent)
+                    .background(CribSwapBlue)
                     .padding(horizontal = 20.dp, vertical = 16.dp)
             ) {
                 Box(
@@ -82,7 +78,7 @@ fun FilterBottomSheet(
                     Box(Modifier.fillMaxWidth().height(22.dp)) {
                         Text(
                             "$${draft.priceMin.toInt()} – $${draft.priceMax.toInt()} / mo",
-                            fontSize = 13.sp, color = Accent, fontWeight = FontWeight.SemiBold
+                            fontSize = 13.sp, color = CribSwapBlue, fontWeight = FontWeight.SemiBold
                         )
                     }
                     RangeSlider(
@@ -92,8 +88,8 @@ fun FilterBottomSheet(
                         },
                         valueRange = 0f..5000f,
                         colors = SliderDefaults.colors(
-                            thumbColor = Accent,
-                            activeTrackColor = Accent,
+                            thumbColor = CribSwapBlue,
+                            activeTrackColor = CribSwapBlue,
                             inactiveTrackColor = DividerColor
                         )
                     )
@@ -108,20 +104,20 @@ fun FilterBottomSheet(
                         onValueChange = { viewModel.updateDraft { copy(locationQuery = it) } },
                         placeholder = { Text("Address or zip code", fontSize = 13.sp) },
                         leadingIcon = {
-                            Icon(Icons.Default.LocationOn, null, tint = Accent,
+                            Icon(Icons.Default.LocationOn, null, tint = CribSwapBlue,
                                 modifier = Modifier.size(18.dp))
                         },
                         singleLine = true,
                         shape = RoundedCornerShape(10.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Accent, unfocusedBorderColor = DividerColor),
+                            focusedBorderColor = CribSwapBlue, unfocusedBorderColor = DividerColor),
                         modifier = Modifier.fillMaxWidth()
                     )
                     Spacer(Modifier.height(10.dp))
                     Box(Modifier.fillMaxWidth().height(22.dp)) {
                         Text(
                             "Within ${draft.distanceMiles.toInt()} mile${if (draft.distanceMiles > 1f) "s" else ""}",
-                            fontSize = 13.sp, color = Accent, fontWeight = FontWeight.SemiBold
+                            fontSize = 13.sp, color = CribSwapBlue, fontWeight = FontWeight.SemiBold
                         )
                     }
                     Slider(
@@ -129,8 +125,8 @@ fun FilterBottomSheet(
                         onValueChange = { viewModel.updateDraft { copy(distanceMiles = it) } },
                         valueRange = 1f..50f, steps = 48,
                         colors = SliderDefaults.colors(
-                            thumbColor = Accent,
-                            activeTrackColor = Accent,
+                            thumbColor = CribSwapBlue,
+                            activeTrackColor = CribSwapBlue,
                             inactiveTrackColor = DividerColor
                         )
                     )
@@ -172,26 +168,21 @@ fun FilterBottomSheet(
                 FilterSection("Lease Term") {
                     Text("Start", fontSize = 12.sp, color = TextSecondary, fontWeight = FontWeight.Medium)
                     Spacer(Modifier.height(6.dp))
-                    MonthYearPicker(
-                        selectedMonth = draft.leaseStartMonth,
+                    MonthYearRangePicker(
+                        selectedStartMonth = draft.leaseStartMonth,
+                        selectedEndMonth = draft.leaseEndMonth,
                         selectedYear = draft.leaseStartYear,
-                        onYearChange = { viewModel.updateDraft { copy(leaseStartYear = it) } },
-                        onMonthSelect = {
+
+                        onYearChange = { year ->
+                            viewModel.updateDraft { copy(leaseStartYear = year, leaseEndYear = year) }
+                        },
+
+                        onRangeChange = { start, end ->
                             viewModel.updateDraft {
-                                copy(leaseStartMonth = if (leaseStartMonth == it) null else it)
-                            }
-                        }
-                    )
-                    Spacer(Modifier.height(14.dp))
-                    Text("End", fontSize = 12.sp, color = TextSecondary, fontWeight = FontWeight.Medium)
-                    Spacer(Modifier.height(6.dp))
-                    MonthYearPicker(
-                        selectedMonth = draft.leaseEndMonth,
-                        selectedYear = draft.leaseEndYear,
-                        onYearChange = { viewModel.updateDraft { copy(leaseEndYear = it) } },
-                        onMonthSelect = {
-                            viewModel.updateDraft {
-                                copy(leaseEndMonth = if (leaseEndMonth == it) null else it)
+                                copy(
+                                    leaseStartMonth = start,
+                                    leaseEndMonth = end
+                                )
                             }
                         }
                     )
@@ -216,7 +207,7 @@ fun FilterBottomSheet(
                                 onCheckedChange = {
                                     viewModel.updateDraft { copy(buildingTypes = buildingTypes.toggle(type)) }
                                 },
-                                colors = CheckboxDefaults.colors(checkedColor = Accent)
+                                colors = CheckboxDefaults.colors(checkedColor = CribSwapBlue)
                             )
                             Text(type, fontSize = 14.sp, color = TextPrimary)
                         }
@@ -255,8 +246,8 @@ fun FilterBottomSheet(
                     onClick = { viewModel.resetFilters() },
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(12.dp),
-                    border = BorderStroke(1.5.dp, Accent),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Accent)
+                    border = BorderStroke(1.5.dp, CribSwapBlue),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = CribSwapBlue)
                 ) { Text("Reset", fontWeight = FontWeight.SemiBold) }
 
                 Button(
@@ -266,7 +257,7 @@ fun FilterBottomSheet(
                     },
                     modifier = Modifier.weight(2f),
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Accent)
+                    colors = ButtonDefaults.buttonColors(containerColor = CribSwapBlue)
                 ) { Text("Apply Filters", fontWeight = FontWeight.SemiBold) }
             }
         }
@@ -307,8 +298,8 @@ private fun SelectionButtonRow(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .clip(RoundedCornerShape(10.dp))
-                    .background(if (isSelected) ButtonSelected else ButtonUnselected)
-                    .border(1.dp, if (isSelected) Accent else Color.Transparent, RoundedCornerShape(10.dp))
+                    .background(if (isSelected) CribSwapBlue else CribSwapBlueLight)
+                    .border(1.dp, if (isSelected) CribSwapBlue else Color.Transparent, RoundedCornerShape(10.dp))
                     .clickable { onToggle(option) }
                     .padding(horizontal = 12.dp, vertical = 8.dp)
             ) {
@@ -323,44 +314,114 @@ private fun SelectionButtonRow(
 }
 
 @Composable
-private fun MonthYearPicker(
-    selectedMonth: String?,
+fun MonthYearRangePicker(
+    selectedStartMonth: String?,
+    selectedEndMonth: String?,
     selectedYear: Int,
     onYearChange: (Int) -> Unit,
-    onMonthSelect: (String) -> Unit
+    onRangeChange: (start: String?, end: String?) -> Unit
 ) {
-    val months = listOf("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
+    val months = listOf(
+        "Jan","Feb","Mar","Apr","May","Jun",
+        "Jul","Aug","Sep","Oct","Nov","Dec"
+    )
+
+    fun monthIndex(m: String?) = m?.let { months.indexOf(it) } ?: -1
+
+    val startIndex = monthIndex(selectedStartMonth)
+    val endIndex = monthIndex(selectedEndMonth)
+
     Column {
-        Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween, Alignment.CenterVertically) {
+
+        // YEAR SELECTOR
+        Row(
+            Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             IconButton(onClick = { onYearChange(selectedYear - 1) }) {
-                Icon(Icons.Default.KeyboardArrowLeft, "Previous year", tint = Accent)
+                Icon(Icons.Default.KeyboardArrowLeft, contentDescription = "Prev", tint = CribSwapBlue)
             }
-            Text(selectedYear.toString(), fontSize = 15.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+
+            Text(
+                text = selectedYear.toString(),
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Bold,
+                color = TextPrimary
+            )
+
             IconButton(onClick = { onYearChange(selectedYear + 1) }) {
-                Icon(Icons.Default.KeyboardArrowRight, "Next year", tint = Accent)
+                Icon(Icons.Default.KeyboardArrowRight, contentDescription = "Next", tint = CribSwapBlue)
             }
         }
-        Spacer(Modifier.height(6.dp))
+
+        Spacer(Modifier.height(8.dp))
+
+        // MONTH GRID (4x3)
         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
             months.chunked(4).forEach { row ->
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
                     row.forEach { month ->
-                        val isSelected = selectedMonth == month
-                        Box(
-                            contentAlignment = Alignment.Center,
+
+                        val index = months.indexOf(month)
+
+                        val isStart = selectedStartMonth == month
+                        val isEnd = selectedEndMonth == month
+                        val isInRange =
+                            startIndex != -1 &&
+                                    endIndex != -1 &&
+                                    index in startIndex..endIndex
+
+                        val bgColor = when {
+                            isStart || isEnd -> CribSwapBlue
+                            isInRange -> CribSwapBlue.copy(alpha = 0.25f)
+                            else -> CribSwapBlueLight
+                        }
+
+                        Surface(
                             modifier = Modifier
                                 .weight(1f)
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(if (isSelected) ButtonSelected else ButtonUnselected)
-                                .clickable { onMonthSelect(month) }
-                                .padding(vertical = 8.dp)
+                                .height(38.dp)
+                                .clickable {
+                                    onRangeChange(selectedStartMonth, selectedEndMonth).let {
+                                        when {
+                                            selectedStartMonth == null -> {
+                                                onRangeChange(month, null)
+                                            }
+
+                                            selectedEndMonth == null -> {
+                                                val start = selectedStartMonth!!
+
+                                                val startIdx = months.indexOf(start)
+                                                val clickedIdx = index
+
+                                                if (clickedIdx < startIdx) {
+                                                    onRangeChange(month, null)
+                                                } else {
+                                                    onRangeChange(start, month)
+                                                }
+                                            }
+
+                                            else -> {
+                                                onRangeChange(month, null)
+                                            }
+                                        }
+                                    }
+                                },
+                            shape = RoundedCornerShape(10.dp),
+                            color = bgColor
                         ) {
-                            Text(
-                                month, fontSize = 12.sp,
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                                color = if (isSelected) Color.White else TextPrimary,
-                                textAlign = TextAlign.Center
-                            )
+                            Box(contentAlignment = Alignment.Center) {
+                                Text(
+                                    text = month,
+                                    fontSize = 12.sp,
+                                    fontWeight = if (isStart || isEnd) FontWeight.Bold else FontWeight.Normal,
+                                    color = if (isStart || isEnd) Color.White else TextPrimary
+                                )
+                            }
                         }
                     }
                 }
@@ -379,7 +440,7 @@ private fun ToggleRow(label: String, checked: Boolean, onToggle: (Boolean) -> Un
         Switch(
             checked = checked, onCheckedChange = onToggle,
             colors = SwitchDefaults.colors(
-                checkedThumbColor = Color.White, checkedTrackColor = Accent,
+                checkedThumbColor = Color.White, checkedTrackColor = CribSwapBlue,
                 uncheckedThumbColor = Color.White, uncheckedTrackColor = DividerColor
             )
         )

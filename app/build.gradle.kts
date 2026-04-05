@@ -5,8 +5,9 @@ plugins {
 
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.google.services)
-}
 
+    id("io.gitlab.arturbosch.detekt")
+}
 android {
     namespace = "com.example.cribswap"
     compileSdk = 36
@@ -73,4 +74,7 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.storage)
+
+    detektPlugins("io.nlopez.compose.rules:detekt:0.4.22")
+
 }

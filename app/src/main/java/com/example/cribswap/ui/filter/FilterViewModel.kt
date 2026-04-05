@@ -13,6 +13,8 @@ class FilterViewModel : ViewModel() {
     private val defaultState: FilterState
         get() = FilterState(leaseStartYear = currentYear, leaseEndYear = currentYear)
 
+    // draft: user is editing filter preferences
+    // applies: copy of draft whe user clicks "apply changes"
     private val _draft = MutableStateFlow(defaultState)
     val draft: StateFlow<FilterState> = _draft.asStateFlow()
 
@@ -23,13 +25,16 @@ class FilterViewModel : ViewModel() {
         _draft.value = _draft.value.update()
     }
 
+    // copy draft to applied
     fun applyFilters() {
         _applied.value = _draft.value
     }
 
+    // clears draft (applied is unchanged)
     fun resetFilters() {
         _draft.value = defaultState
     }
+
     fun applyPreferences(state: FilterState) {
         _draft.value = state
         _applied.value = state

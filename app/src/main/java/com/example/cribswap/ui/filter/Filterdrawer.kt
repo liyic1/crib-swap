@@ -168,21 +168,26 @@ fun FilterBottomSheet(
                 FilterSection("Lease Term") {
                     Text("Start", fontSize = 12.sp, color = TextSecondary, fontWeight = FontWeight.Medium)
                     Spacer(Modifier.height(6.dp))
-                    MonthYearRangePicker(
-                        selectedStartMonth = draft.leaseStartMonth,
-                        selectedEndMonth = draft.leaseEndMonth,
+                    MonthYearPicker(
+                        selectedMonth = draft.leaseStartMonth,
                         selectedYear = draft.leaseStartYear,
-
-                        onYearChange = { year ->
-                            viewModel.updateDraft { copy(leaseStartYear = year, leaseEndYear = year) }
-                        },
-
-                        onRangeChange = { start, end ->
+                        onYearChange = { viewModel.updateDraft { copy(leaseStartYear = it) } },
+                        onMonthSelect = {
                             viewModel.updateDraft {
-                                copy(
-                                    leaseStartMonth = start,
-                                    leaseEndMonth = end
-                                )
+                                copy(leaseStartMonth = if (leaseStartMonth == it) null else it)
+                            }
+                        }
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    Text("End", fontSize = 12.sp, color = TextSecondary, fontWeight = FontWeight.Medium)
+                    Spacer(Modifier.height(6.dp))
+                    MonthYearPicker(
+                        selectedMonth = draft.leaseEndMonth,
+                        selectedYear = draft.leaseEndYear,
+                        onYearChange = { viewModel.updateDraft { copy(leaseEndYear = it) } },
+                        onMonthSelect = {
+                            viewModel.updateDraft {
+                                copy(leaseEndMonth = if (leaseEndMonth == it) null else it)
                             }
                         }
                     )
@@ -333,7 +338,7 @@ fun MonthYearRangePicker(
 
     Column {
 
-        // YEAR SELECTOR
+        // Select Year
         Row(
             Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -357,7 +362,7 @@ fun MonthYearRangePicker(
 
         Spacer(Modifier.height(8.dp))
 
-        // MONTH GRID (4x3)
+        // Select Month
         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
             months.chunked(4).forEach { row ->
                 Row(

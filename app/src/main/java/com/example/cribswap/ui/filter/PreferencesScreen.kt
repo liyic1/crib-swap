@@ -215,7 +215,7 @@ private fun PrefsSection(
 }
 
 @Composable
-private fun MonthYearPicker(
+fun MonthYearPicker(
     selectedMonth: String?,
     selectedYear: Int,
     onYearChange: (Int) -> Unit,

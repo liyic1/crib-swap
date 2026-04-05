@@ -24,6 +24,7 @@ class PreferencesViewModel : ViewModel() {
         _prefs.value = _prefs.value.update()
     }
 
+    // connects filter and preferences, sets both draft and applied
     fun completeOnboarding(filterViewModel: FilterViewModel) {
         val p = _prefs.value
         filterViewModel.applyPreferences(

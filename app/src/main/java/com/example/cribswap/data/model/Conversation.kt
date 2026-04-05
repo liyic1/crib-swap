@@ -1,5 +1,3 @@
-
-
 package com.example.cribswap.data.model
 
 import com.google.firebase.Timestamp
@@ -15,7 +13,7 @@ data class Conversation(
     //Store list of userId in on conversation, Ex. [myUserId, otherUserId]
     val participants: List<String> = emptyList(),
     //Store the latest message, so we don't have to fetch it everytime
-    val lastMessageTest: String? = null,
+    val lastMessage: String? = "",
     // time of the last message
     val lastMessageAt: Timestamp? = null,
     //when the conversation was created

@@ -1,10 +1,10 @@
 package com.example.cribswap.data.repo
 
-import com.example.cribswap.data.model.Conversation
-import com.example.cribswap.data.remote.FirestoreRefs
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.example.cribswap.data.model.Conversation
+import com.example.cribswap.data.remote.FirestoreRefs
 import kotlinx.coroutines.tasks.await
 
 /**
@@ -21,12 +21,25 @@ class ConversationRepository(
         //Store participants as a stable sorted list.
         //Sorting helps avoid duplicates caused by different order.
         val participants = listOf(myUid, otherUserId).sorted()
+
+        val existing = FirestoreRefs.conversations(db)
+            .whereEqualTo("participants", participants)
+            .get()
+            .await()
+
+        if (!existing.isEmpty) {
+            return existing.documents.first().id
+        }
+
         //Create a new document with an auto-generated ID
         val doc = FirestoreRefs.conversations(db).document()
         //Create the Conversation object that will be saved to Firestore
         val data = Conversation(
+            id = doc.id,
             participants = participants,
-            createdAt = Timestamp.now()
+            createdAt = Timestamp.now(),
+            lastMessage = "",
+            lastMessageAt = null
         )
         //Write the object to Firestore (wait until it finishes)
         doc.set(data).await()
@@ -56,5 +69,27 @@ class ConversationRepository(
         }
 
     }
+    suspend fun getConversationById(conversationId: String): Conversation? {
+        val doc = FirestoreRefs.conversations(db)
+            .document(conversationId)
+            .get()
+            .await()
 
+        return doc.toObject(Conversation::class.java)
+    }
+
+    suspend fun updateLastMessage(
+        conversationId: String,
+        messageText: String
+    ) {
+        FirestoreRefs.conversations(db)
+            .document(conversationId)
+            .update(
+                mapOf(
+                    "lastMessage" to messageText,
+                    "lastMessageAt" to Timestamp.now()
+                )
+            )
+            .await()
+    }
 }

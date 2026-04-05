@@ -12,7 +12,7 @@ import com.google.firebase.auth.FirebaseAuth
 
 class LoginViewModel : ViewModel() {
     var loginUIState = mutableStateOf(LoginUIState())
-    private val TAG = LoginViewModel::class.simpleName
+    private val tag = LoginViewModel::class.simpleName
     var allValidatorPassed = mutableStateOf(false)
     var loginInProgress = mutableStateOf(false)
 
@@ -60,21 +60,21 @@ class LoginViewModel : ViewModel() {
             .getInstance()
             .signInWithEmailAndPassword(email, password)
             .addOnCompleteListener {
-                Log.d(TAG, "Inside_login_success")
+                Log.d(tag, "Inside_login_success")
                 if (it.isSuccessful) {
                     loginInProgress.value = false
                     CribSwapAppRouter.navigateTo(Screen.MainScreen)
                 }
             }
             .addOnFailureListener {
-                Log.d(TAG, "Inside_login_failure")
+                Log.d(tag, "Inside_login_failure")
                 loginInProgress.value = false
 
             }
     }
 
     private fun printState() {
-        Log.d(TAG, "Inside_printState")
-        Log.d(TAG, loginUIState.value.toString())
+        Log.d(tag, "Inside_printState")
+        Log.d(tag, loginUIState.value.toString())
     }
 }

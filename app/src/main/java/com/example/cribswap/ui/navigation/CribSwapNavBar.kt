@@ -34,7 +34,6 @@ import com.example.cribswap.ui.theme.NavBarContentSelected
 import com.example.cribswap.ui.theme.NavBarContentUnselected
 import com.example.cribswap.ui.theme.NavBarIndicator
 
-enum class ProfileSubScreen { Profile, Settings, PersonalDetail }
 
 private val navItemList = listOf(
     NavItem("Home", Icons.Default.Home),

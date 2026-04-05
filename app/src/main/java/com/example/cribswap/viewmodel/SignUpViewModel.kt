@@ -12,7 +12,7 @@ import com.google.firebase.auth.FirebaseAuth
 
 class SignUpViewModel : ViewModel() {
     var registrationUIState = mutableStateOf(RegistrationUIState())
-    private val TAG = SignUpViewModel::class.simpleName
+    private val tag = SignUpViewModel::class.simpleName
     var allValidatorPassed = mutableStateOf(false)
     var signUpInProgress = mutableStateOf(false)
 
@@ -44,7 +44,7 @@ class SignUpViewModel : ViewModel() {
     }
 
     private fun signUp() {
-        Log.d(TAG, "Inside_signUp")
+        Log.d(tag, "Inside_signUp")
         printState()
 //        validateDataWithRules()
         createUserInFirebase(
@@ -60,9 +60,9 @@ class SignUpViewModel : ViewModel() {
         val passwordResult = Validator.validatePassword(
             password = registrationUIState.value.password
         )
-        Log.d(TAG, "Inside_validateDataWithRules")
-        Log.d(TAG, "email = $emailResult")
-        Log.d(TAG, "password = $passwordResult")
+        Log.d(tag, "Inside_validateDataWithRules")
+        Log.d(tag, "email = $emailResult")
+        Log.d(tag, "password = $passwordResult")
         registrationUIState.value = registrationUIState.value.copy(
             emailError = emailResult.status,
             passwordError = passwordResult.status
@@ -71,8 +71,8 @@ class SignUpViewModel : ViewModel() {
     }
 
     private fun printState() {
-        Log.d(TAG, "Inside_printState")
-        Log.d(TAG, registrationUIState.value.toString())
+        Log.d(tag, "Inside_printState")
+        Log.d(tag, registrationUIState.value.toString())
     }
 
     private fun createUserInFirebase(email:String, password:String) {
@@ -80,16 +80,16 @@ class SignUpViewModel : ViewModel() {
         FirebaseAuth.getInstance()
             .createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener {
-                Log.d(TAG,"Inside_OnCompleteListener")
-                Log.d(TAG,"it.isSuccessful = ${it.isSuccessful}")
+                Log.d(tag,"Inside_OnCompleteListener")
+                Log.d(tag,"it.isSuccessful = ${it.isSuccessful}")
                 signUpInProgress.value = false
                 if (it.isSuccessful) {
                     CribSwapAppRouter.navigateTo(Screen.MainScreen)
                 }
             }
             .addOnFailureListener {
-                Log.d(TAG,"Inside_OnFailureListener")
-                Log.d(TAG,"Exception = ${it.localizedMessage}")
+                Log.d(tag,"Inside_OnFailureListener")
+                Log.d(tag,"Exception = ${it.localizedMessage}")
             }
     }
 }

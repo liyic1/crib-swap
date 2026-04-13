@@ -1,10 +1,14 @@
 package com.example.cribswap.data
 
-data class RegistrationUIState (
-    var email :String ="",
-    var password :String ="",
+data class RegistrationUIState(
+    var firstName: String = "",
+    var lastName: String = "",
+    var email: String = "",
+    var password: String = "",
+    var rePassword: String = "",
 
+    var firstNameError: Boolean = false,
+    var lastNameError: Boolean = false,
     var emailError: Boolean = false,
     var passwordError: Boolean = false,
-
 )

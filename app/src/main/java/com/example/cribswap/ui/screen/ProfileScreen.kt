@@ -1,6 +1,5 @@
 package com.example.cribswap.ui.screen
 
-import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,16 +17,12 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.cribswap.navigation.CribSwapAppRouter
-import com.example.cribswap.navigation.Screen
 import com.example.cribswap.ui.components.ProfileItems
 import com.example.cribswap.ui.components.ProfilePicture
 
@@ -95,44 +90,5 @@ fun ProfileScreen(
             icon = { Icon(Icons.Default.Settings, contentDescription = null) },
             onClick = onNavigateToSettings
         )
-    }
-}
-
-@Preview
-@Composable
-fun DefaultPreviewOfProfileScreen() {
-    Surface (
-        modifier = Modifier.fillMaxSize(),
-        color = Color.White
-    ) {
-        Crossfade(targetState = CribSwapAppRouter.currentScreen) { currentState ->
-            when (currentState.value) {
-                is Screen.ProfileScreen -> {
-                    ProfileScreen()
-                }
-                is Screen.SettingsScreen -> {
-                    SettingsScreen()
-                }
-                is Screen.PersonalDetailScreen -> {
-                    PersonalDetailScreen()
-                }
-                is Screen.SignUpScreen -> {
-                    SignUpScreen()
-                }
-                is Screen.LoginScreen -> {
-                    LoginScreen()
-                }
-                is Screen.ForgotPasswordScreen -> {
-                    ForgotPasswordScreen()
-                }
-                is Screen.HomeScreen -> {
-                    HomeScreen()
-                }
-                else -> {
-                    // MainScreen and any future screens not shown in preview
-                }
-            }
-
-        }
     }
 }

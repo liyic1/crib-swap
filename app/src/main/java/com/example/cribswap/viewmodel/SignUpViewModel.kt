@@ -5,91 +5,112 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.example.cribswap.data.RegistrationUIState
 import com.example.cribswap.data.SignUpUIEvent
+import com.example.cribswap.data.model.User
+import com.example.cribswap.data.repo.UserRepository
 import com.example.cribswap.data.rules.Validator
 import com.example.cribswap.navigation.CribSwapAppRouter
 import com.example.cribswap.navigation.Screen
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.UserProfileChangeRequest
 
 class SignUpViewModel : ViewModel() {
     var registrationUIState = mutableStateOf(RegistrationUIState())
     private val tag = SignUpViewModel::class.simpleName
     var allValidatorPassed = mutableStateOf(false)
     var signUpInProgress = mutableStateOf(false)
+    var signUpError = mutableStateOf<String?>(null)
 
     fun onEvent(event: SignUpUIEvent) {
-        validateDataWithRules()
-        when(event) {
+        when (event) {
+            is SignUpUIEvent.FirstNameChanged -> {
+                registrationUIState.value = registrationUIState.value.copy(firstName = event.firstName)
+            }
+            is SignUpUIEvent.LastNameChanged -> {
+                registrationUIState.value = registrationUIState.value.copy(lastName = event.lastName)
+            }
             is SignUpUIEvent.EmailChanged -> {
-                registrationUIState.value = registrationUIState.value.copy(
-                    email = event.email
-                )
-                printState()
+                registrationUIState.value = registrationUIState.value.copy(email = event.email)
             }
             is SignUpUIEvent.PasswordChanged -> {
-                registrationUIState.value = registrationUIState.value.copy(
-                    password = event.password
-                )
-                printState()
+                registrationUIState.value = registrationUIState.value.copy(password = event.password)
             }
             is SignUpUIEvent.ReEnterPasswordChanged -> {
-                registrationUIState.value = registrationUIState.value.copy(
-                    password = event.password
-                )
-                printState()
+                registrationUIState.value = registrationUIState.value.copy(rePassword = event.password)
             }
             is SignUpUIEvent.RegisterButtonClicked -> {
                 signUp()
             }
         }
-    }
-
-    private fun signUp() {
-        Log.d(tag, "Inside_signUp")
-        printState()
-//        validateDataWithRules()
-        createUserInFirebase(
-            email = registrationUIState.value.email,
-            password = registrationUIState.value.password
-        )
+        validateDataWithRules() // runs AFTER state is updated
     }
 
     private fun validateDataWithRules() {
-        val emailResult = Validator.validateEmail(
-            email = registrationUIState.value.email
-        )
-        val passwordResult = Validator.validatePassword(
-            password = registrationUIState.value.password
-        )
-        Log.d(tag, "Inside_validateDataWithRules")
-        Log.d(tag, "email = $emailResult")
-        Log.d(tag, "password = $passwordResult")
+        val firstNameResult = Validator.validateFirstName(registrationUIState.value.firstName)
+        val lastNameResult = Validator.validateLastName(registrationUIState.value.lastName)
+        val emailResult = Validator.validateEmail(registrationUIState.value.email)
+        val passwordResult = Validator.validatePassword(registrationUIState.value.password)
+
         registrationUIState.value = registrationUIState.value.copy(
+            firstNameError = firstNameResult.status,
+            lastNameError = lastNameResult.status,
             emailError = emailResult.status,
             passwordError = passwordResult.status
         )
-        allValidatorPassed.value = emailResult.status && passwordResult.status
+
+        allValidatorPassed.value = firstNameResult.status && lastNameResult.status &&
+                emailResult.status && passwordResult.status
     }
 
-    private fun printState() {
-        Log.d(tag, "Inside_printState")
-        Log.d(tag, registrationUIState.value.toString())
-    }
-
-    private fun createUserInFirebase(email:String, password:String) {
+    private fun signUp() {
         signUpInProgress.value = true
+        signUpError.value = null
+
         FirebaseAuth.getInstance()
-            .createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener {
-                Log.d(tag,"Inside_OnCompleteListener")
-                Log.d(tag,"it.isSuccessful = ${it.isSuccessful}")
+            .createUserWithEmailAndPassword(
+                registrationUIState.value.email,
+                registrationUIState.value.password
+            )
+            .addOnCompleteListener { task ->
                 signUpInProgress.value = false
-                if (it.isSuccessful) {
-                    CribSwapAppRouter.navigateTo(Screen.MainScreen)
+                if (task.isSuccessful) {
+                    val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return@addOnCompleteListener
+                    val fullName = "${registrationUIState.value.firstName} ${registrationUIState.value.lastName}"
+
+                    // Save display name to Firebase Auth profile
+                    val profileUpdates = UserProfileChangeRequest.Builder()
+                        .setDisplayName(fullName)
+                        .build()
+                    FirebaseAuth.getInstance().currentUser?.updateProfile(profileUpdates)
+
+                    // Save full user to Firestore
+                    val newUser = User(
+                        uid = uid,
+                        email = registrationUIState.value.email,
+                        displayName = fullName,
+                        firstName = registrationUIState.value.firstName,
+                        lastName = registrationUIState.value.lastName
+                    )
+                    UserRepository.createUser(
+                        user = newUser,
+                        onSuccess = {
+                            Log.d(tag, "User saved to Firestore successfully")
+                            CribSwapAppRouter.navigateTo(Screen.MainScreen)
+                        },
+                        onFailure = { e ->
+                            Log.d(tag, "Firestore save failed: ${e.message}")
+                            // Still navigate even if Firestore fails — auth succeeded
+                            CribSwapAppRouter.navigateTo(Screen.MainScreen)
+                        }
+                    )
+                } else {
+                    signUpError.value = task.exception?.localizedMessage ?: "Sign up failed"
+                    Log.d(tag, "SignUp failed: ${task.exception?.message}")
                 }
             }
-            .addOnFailureListener {
-                Log.d(tag,"Inside_OnFailureListener")
-                Log.d(tag,"Exception = ${it.localizedMessage}")
+            .addOnFailureListener { e ->
+                signUpInProgress.value = false
+                signUpError.value = e.localizedMessage ?: "Something went wrong"
+                Log.d(tag, "SignUp failure: ${e.localizedMessage}")
             }
     }
 }

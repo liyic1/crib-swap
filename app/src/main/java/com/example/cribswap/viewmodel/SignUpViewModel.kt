@@ -41,7 +41,7 @@ class SignUpViewModel : ViewModel() {
                 signUp()
             }
         }
-        validateDataWithRules() // runs AFTER state is updated
+        validateDataWithRules()
     }
 
     private fun validateDataWithRules() {
@@ -76,13 +76,11 @@ class SignUpViewModel : ViewModel() {
                     val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return@addOnCompleteListener
                     val fullName = "${registrationUIState.value.firstName} ${registrationUIState.value.lastName}"
 
-                    // Save display name to Firebase Auth profile
                     val profileUpdates = UserProfileChangeRequest.Builder()
                         .setDisplayName(fullName)
                         .build()
                     FirebaseAuth.getInstance().currentUser?.updateProfile(profileUpdates)
 
-                    // Save full user to Firestore
                     val newUser = User(
                         uid = uid,
                         email = registrationUIState.value.email,
@@ -98,7 +96,6 @@ class SignUpViewModel : ViewModel() {
                         },
                         onFailure = { e ->
                             Log.d(tag, "Firestore save failed: ${e.message}")
-                            // Still navigate even if Firestore fails — auth succeeded
                             CribSwapAppRouter.navigateTo(Screen.MainScreen)
                         }
                     )

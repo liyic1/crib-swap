@@ -23,15 +23,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.cribswap.ui.components.ProfileItems
 import com.example.cribswap.ui.components.ProfilePicture
+import com.example.cribswap.viewmodel.ProfileViewModel
 
 @Composable
 fun ProfileScreen(
     onNavigateToSettings: () -> Unit = {},
-    onNavigateToPersonalDetail: () -> Unit = {}
+    onNavigateToPersonalDetail: () -> Unit = {},
+    profileViewModel: ProfileViewModel = viewModel()
 ) {
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -39,9 +41,7 @@ fun ProfileScreen(
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
         Spacer(modifier = Modifier.height(30.dp))
-
         Box(
             modifier = Modifier
                 .size(90.dp)
@@ -57,9 +57,7 @@ fun ProfileScreen(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        Text(
-            text = "John Doe",
-        )
+        Text(text = profileViewModel.getDisplayName())
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -67,17 +65,13 @@ fun ProfileScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth()
         ) {
-
             ProfilePicture("2", "Listings")
             ProfilePicture("0", "Leased")
             ProfilePicture("1", "Reviews")
-
         }
 
         Spacer(modifier = Modifier.height(24.dp))
-
         Divider()
-
         Spacer(modifier = Modifier.height(16.dp))
 
         ProfileItems(

@@ -14,17 +14,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.cribswap.navigation.CribSwapAppRouter
-import com.example.cribswap.navigation.Screen
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.cribswap.ui.components.BackButton
 import com.example.cribswap.ui.components.ValueBox
-
+import com.example.cribswap.viewmodel.ProfileViewModel
 
 @Composable
 fun PersonalDetailScreen(
-    onBack: () -> Unit = {}
+    onBack: () -> Unit = {},
+    profileViewModel: ProfileViewModel = viewModel()
 ) {
     Surface(
         color = Color.White,
@@ -34,35 +33,59 @@ fun PersonalDetailScreen(
             modifier = Modifier.fillMaxWidth().padding(24.dp),
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                BackButton {
-                    onBack()
-                }
+                BackButton { onBack() }
                 Spacer(modifier = Modifier.width(26.dp))
                 Text(text = "Personal Detail")
-                Spacer(modifier = Modifier.height(16.dp))
             }
+
             Spacer(modifier = Modifier.height(16.dp))
-            Text("Full Name")
-            ValueBox("John Doe")
+
+            val user = profileViewModel.currentUser.value
+
+            Text("First Name")
+            if (user == null || user.firstName.isEmpty()) {
+                ValueBox("Not set")
+            } else {
+                ValueBox(user.firstName)
+            }
+
             Spacer(modifier = Modifier.height(16.dp))
-            Text("Username")
-            ValueBox("Johnny12")
+
+            Text("Last Name")
+            if (user == null || user.lastName.isEmpty()) {
+                ValueBox("Not set")
+            } else {
+                ValueBox(user.lastName)
+            }
+
             Spacer(modifier = Modifier.height(16.dp))
+
             Text("Email")
-            ValueBox("Johndoe@umn.edu")
+            if (user == null || user.email.isEmpty()) {
+                ValueBox("Not set")
+            } else {
+                ValueBox(user.email)
+            }
+
             Spacer(modifier = Modifier.height(16.dp))
+
             Text("Phone Number")
-            ValueBox("+1 234 567 8910")
+            if (user == null || user.phoneNumber.isEmpty()) {
+                ValueBox("Not set")
+            } else {
+                ValueBox(user.phoneNumber)
+            }
+
             Spacer(modifier = Modifier.height(16.dp))
+
             Text("Address")
-            ValueBox("45 New Avenue, New York")
+            if (user == null || user.address.isEmpty()) {
+                ValueBox("Not set")
+            } else {
+                ValueBox(user.address)
+            }
+
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
-}
-
-@Preview
-@Composable
-fun DefaultPreviewOfPersonalDetailScreen() {
-    PersonalDetailScreen()
 }

@@ -13,10 +13,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -24,6 +27,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.cribswap.navigation.CribSwapAppRouter
+import com.example.cribswap.navigation.Screen
 import com.example.cribswap.ui.components.ProfileItems
 import com.example.cribswap.ui.components.ProfilePicture
 import com.example.cribswap.viewmodel.ProfileViewModel
@@ -34,6 +39,9 @@ fun ProfileScreen(
     onNavigateToPersonalDetail: () -> Unit = {},
     profileViewModel: ProfileViewModel = viewModel()
 ) {
+    val user = profileViewModel.user.value
+    val isLoading = profileViewModel.isLoading.value
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -57,7 +65,20 @@ fun ProfileScreen(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        Text(text = profileViewModel.getDisplayName())
+        if (isLoading) {
+            CircularProgressIndicator(modifier = Modifier.size(24.dp))
+        } else {
+            Text(
+                text = user?.displayName ?: "Unknown User",
+                style = MaterialTheme.typography.titleMedium
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = user?.email ?: "",
+                color = Color.Gray,
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -71,11 +92,13 @@ fun ProfileScreen(
         }
 
         Spacer(modifier = Modifier.height(24.dp))
+
         Divider()
+
         Spacer(modifier = Modifier.height(16.dp))
 
         ProfileItems(
-            title = "Personal details",
+            title = "Personal Details",
             icon = { Icon(Icons.Default.Person, contentDescription = null) },
             onClick = onNavigateToPersonalDetail
         )
@@ -83,6 +106,14 @@ fun ProfileScreen(
             title = "Settings",
             icon = { Icon(Icons.Default.Settings, contentDescription = null) },
             onClick = onNavigateToSettings
+        )
+        ProfileItems(
+            title = "Sign Out",
+            icon = { Icon(Icons.Default.ExitToApp, contentDescription = null) },
+            onClick = {
+                profileViewModel.signOut()
+                CribSwapAppRouter.navigateTo(Screen.LoginScreen)
+            }
         )
     }
 }

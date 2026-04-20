@@ -1,60 +1,43 @@
 package com.example.cribswap.viewmodel
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.example.cribswap.data.model.User
 import com.example.cribswap.data.repo.UserRepository
 import com.google.firebase.auth.FirebaseAuth
+
 class ProfileViewModel : ViewModel() {
 
-    var currentUser = mutableStateOf<User?>(null)
-        private set
-
+    var user = mutableStateOf<User?>(null)
     var isLoading = mutableStateOf(true)
-        private set
-
     var errorMessage = mutableStateOf<String?>(null)
-        private set
-
-    private val tag = ProfileViewModel::class.simpleName
 
     init {
-        fetchCurrentUser()
+        loadUser()
     }
 
-    private fun fetchCurrentUser() {
+    fun loadUser() {
         val uid = FirebaseAuth.getInstance().currentUser?.uid
-
         if (uid == null) {
-            errorMessage.value = "No user logged in"
             isLoading.value = false
+            errorMessage.value = "Not logged in"
             return
         }
-
+        isLoading.value = true
         UserRepository.getUser(
             uid = uid,
-            onSuccess = { user ->
-                currentUser.value = user
+            onSuccess = { fetchedUser ->
+                user.value = fetchedUser
                 isLoading.value = false
-                Log.d(tag, "User fetched: ${user?.displayName}")
             },
             onFailure = { e ->
-                errorMessage.value = "Failed to load profile"
+                errorMessage.value = e.localizedMessage
                 isLoading.value = false
-                Log.d(tag, "Failed to fetch user: ${e.message}")
             }
         )
     }
 
-    fun getDisplayName(): String {
-        val user = currentUser.value
-        if (user == null) {
-            return "Loading..."
-        }
-        if (user.displayName.isEmpty()) {
-            return "No name set"
-        }
-        return user.displayName
+    fun signOut() {
+        FirebaseAuth.getInstance().signOut()
     }
 }

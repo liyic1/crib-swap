@@ -57,11 +57,17 @@ class LoginViewModel : ViewModel() {
             .addOnCompleteListener { task ->
                 loginInProgress.value = false
                 if (task.isSuccessful) {
-                    Log.d(tag, "Login successful")
-                    CribSwapAppRouter.navigateTo(Screen.MainScreen)
-                } else {
-                    loginError.value = task.exception?.localizedMessage ?: "Login failed"
-                    Log.d(tag, "Login failed: ${task.exception?.message}")
+                    val user = FirebaseAuth.getInstance().currentUser
+
+                    user?.reload()?.addOnCompleteListener {
+                        if (user.isEmailVerified) {
+                            CribSwapAppRouter.navigateTo(Screen.MainScreen)
+                        } else {
+                            FirebaseAuth.getInstance().signOut()
+                            loginError.value = "Your email is not verified, please verify before moving on"
+                            user.sendEmailVerification()
+                        }
+                    }
                 }
             }
             .addOnFailureListener { e ->

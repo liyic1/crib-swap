@@ -68,7 +68,6 @@ fun LoginScreen(loginViewModel: LoginViewModel = viewModel()) {
                     CribSwapAppRouter.navigateTo(Screen.ForgotPasswordScreen)
                 })
 
-                // Show error message if login fails
                 loginViewModel.loginError.value?.let { error ->
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(text = error, color = Color.Red)

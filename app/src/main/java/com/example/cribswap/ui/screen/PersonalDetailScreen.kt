@@ -1,5 +1,6 @@
 package com.example.cribswap.ui.screen
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -8,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,6 +28,9 @@ fun PersonalDetailScreen(
     onBack: () -> Unit = {},
     profileViewModel: ProfileViewModel = viewModel()
 ) {
+    val user = profileViewModel.user.value
+    val isLoading = profileViewModel.isLoading.value
+
     Surface(
         color = Color.White,
         modifier = Modifier.fillMaxSize().padding(28.dp)
@@ -34,58 +40,38 @@ fun PersonalDetailScreen(
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 BackButton { onBack() }
-                Spacer(modifier = Modifier.width(26.dp))
-                Text(text = "Personal Detail")
+                Spacer(modifier = Modifier.width(16.dp))
+                Text(text = "Personal Details", style = MaterialTheme.typography.titleMedium)
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-            val user = profileViewModel.currentUser.value
-
-            Text("First Name")
-            if (user == null || user.firstName.isEmpty()) {
-                ValueBox("Not set")
+            if (isLoading) {
+                Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            } else if (user == null) {
+                Text("Could not load profile.", color = Color.Red)
             } else {
-                ValueBox(user.firstName)
+                Text("Full Name", style = MaterialTheme.typography.labelMedium, color = Color.Gray)
+                Spacer(modifier = Modifier.height(4.dp))
+                ValueBox(user.displayName.ifBlank { "—" })
+
+                Spacer(modifier = Modifier.height(16.dp))
+                Text("Email", style = MaterialTheme.typography.labelMedium, color = Color.Gray)
+                Spacer(modifier = Modifier.height(4.dp))
+                ValueBox(user.email.ifBlank { "—" })
+
+                Spacer(modifier = Modifier.height(16.dp))
+                Text("Phone Number", style = MaterialTheme.typography.labelMedium, color = Color.Gray)
+                Spacer(modifier = Modifier.height(4.dp))
+                ValueBox(user.phoneNumber.ifBlank { "Not set" })
+
+                Spacer(modifier = Modifier.height(16.dp))
+                Text("Address", style = MaterialTheme.typography.labelMedium, color = Color.Gray)
+                Spacer(modifier = Modifier.height(4.dp))
+                ValueBox(user.address.ifBlank { "Not set" })
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text("Last Name")
-            if (user == null || user.lastName.isEmpty()) {
-                ValueBox("Not set")
-            } else {
-                ValueBox(user.lastName)
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text("Email")
-            if (user == null || user.email.isEmpty()) {
-                ValueBox("Not set")
-            } else {
-                ValueBox(user.email)
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text("Phone Number")
-            if (user == null || user.phoneNumber.isEmpty()) {
-                ValueBox("Not set")
-            } else {
-                ValueBox(user.phoneNumber)
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text("Address")
-            if (user == null || user.address.isEmpty()) {
-                ValueBox("Not set")
-            } else {
-                ValueBox(user.address)
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }

@@ -1,12 +1,13 @@
 package com.example.cribswap.ui.filter
 
 import androidx.lifecycle.ViewModel
+import com.example.cribswap.data.repo.SubleaseRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.util.Calendar
 
-class PreferencesViewModel : ViewModel() {
+class PreferencesViewModel(private val repository: SubleaseRepository) : ViewModel() {
 
     private val currentYear: Int
         get() = Calendar.getInstance().get(Calendar.YEAR)
@@ -25,20 +26,19 @@ class PreferencesViewModel : ViewModel() {
     }
 
     // connects filter and preferences, sets both draft and applied
-    fun completeOnboarding(filterViewModel: FilterViewModel) {
+    fun completeOnboarding() {
         val p = _prefs.value
-        filterViewModel.applyPreferences(
-            FilterState(
-                priceMin        = p.priceMin,
-                priceMax        = p.priceMax,
-                locationQuery   = p.locationQuery,
-                distanceMiles   = p.distanceMiles,
-                leaseStartMonth = p.leaseStartMonth,
-                leaseStartYear  = p.leaseStartYear,
-                leaseEndMonth   = p.leaseEndMonth,
-                leaseEndYear    = p.leaseEndYear
-            )
+        val initialState = FilterState(
+            priceMin        = p.priceMin,
+            priceMax        = p.priceMax,
+            locationQuery   = p.locationQuery,
+            distanceMiles   = p.distanceMiles,
+            leaseStartMonth = p.leaseStartMonth,
+            leaseStartYear  = p.leaseStartYear,
+            leaseEndMonth   = p.leaseEndMonth,
+            leaseEndYear    = p.leaseEndYear
         )
+        repository.updateFilters(initialState)
         _onboardingComplete.value = true
     }
 }

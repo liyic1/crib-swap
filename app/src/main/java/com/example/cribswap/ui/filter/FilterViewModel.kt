@@ -1,11 +1,12 @@
 package com.example.cribswap.ui.filter
 
 import androidx.lifecycle.ViewModel
+import com.example.cribswap.data.repo.SubleaseRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class FilterViewModel : ViewModel() {
+class FilterViewModel(private val repository: SubleaseRepository) : ViewModel() {
 
     private val currentYear: Int
         get() = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR)
@@ -28,6 +29,7 @@ class FilterViewModel : ViewModel() {
     // copy draft to applied
     fun applyFilters() {
         _applied.value = _draft.value
+        repository.updateFilters(_applied.value)
     }
 
     // clears draft (applied is unchanged)
@@ -38,5 +40,8 @@ class FilterViewModel : ViewModel() {
     fun applyPreferences(state: FilterState) {
         _draft.value = state
         _applied.value = state
+        repository.updateFilters(state)
     }
+
+
 }

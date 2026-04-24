@@ -1,6 +1,7 @@
 package com.example.cribswap.ui.filter
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -245,6 +246,7 @@ fun MonthYearPicker(
                                 .weight(1f)
                                 .clip(RoundedCornerShape(8.dp))
                                 .background(if (isSelected) CribSwapBlue else CribSwapBlueLight)
+                                .clickable { onMonthSelect(month) }
                                 .padding(vertical = 8.dp)
                         ) {
                             Text(

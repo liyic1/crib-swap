@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.lazy.LazyColumn
@@ -28,7 +27,6 @@ import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -39,6 +37,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,9 +45,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.cribswap.data.model.Message
+import com.example.cribswap.data.remote.MessageRemoteDataSource
+import com.example.cribswap.data.repo.ConversationRepository
+import com.example.cribswap.data.repo.MessageRepository
+import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 private val ChatBlue = Color(0xFF2F80ED)
 private val IncomingBubble = Color(0xFFF1F1F1)
@@ -60,17 +68,33 @@ private val InputBg = Color(0xFFF9F9F9)
 @Composable
 fun ChatPage(
     modifier: Modifier = Modifier,
-    userName: String = "Harry Stebbings",
+    conversationId: String,
+    userName: String,
     userStatus: String = "Typically responds within 1 hour",
     onBackClick: () -> Unit = {}
 ) {
-    val messages = remember { mutableStateListOf<ChatMessage>().apply { addAll(fakeMessages) } }
+    val db = remember { FirebaseFirestore.getInstance() }
+    val auth = remember { FirebaseAuth.getInstance() }
+    val conversationRepository = remember { ConversationRepository(db, auth) }
+    val messageRemoteDataSource = remember { MessageRemoteDataSource(db) }
+    val messageRepository = remember {
+        MessageRepository(messageRemoteDataSource, conversationRepository)
+    }
+
+    val messages = remember { mutableStateListOf<Message>() }
     var messageText by remember { mutableStateOf("") }
     val listState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
 
-    LaunchedEffect(messages.size) {
+    suspend fun loadMessages() {
+        messages.clear()
+        messages.addAll(messageRepository.getMessagesForConversation(conversationId))
+    }
+
+    LaunchedEffect(conversationId) {
+        loadMessages()
         if (messages.isNotEmpty()) {
-            listState.animateScrollToItem(messages.lastIndex)
+            listState.scrollToItem(messages.lastIndex)
         }
     }
 
@@ -101,7 +125,11 @@ fun ChatPage(
             }
 
             items(messages) { message ->
-                MessageBubble(message = message)
+                MessageBubble(
+                    text = message.text,
+                    time = formatMessageTime(message.timestamp),
+                    isFromMe = message.senderId == auth.currentUser?.uid
+                )
             }
         }
 
@@ -110,16 +138,26 @@ fun ChatPage(
             onValueChange = { messageText = it },
             onSendClick = {
                 val trimmed = messageText.trim()
+                val myUid = auth.currentUser?.uid ?: return@ChatInputBar
+
                 if (trimmed.isNotEmpty()) {
-                    messages.add(
-                        ChatMessage(
-                            id = messages.size + 1,
+                    scope.launch {
+                        val newMessage = Message(
+                            conversationId = conversationId,
+                            senderId = myUid,
                             text = trimmed,
-                            time = "Now",
-                            isFromMe = true
+                            timestamp = Timestamp.now(),
+                            read = false
                         )
-                    )
-                    messageText = ""
+
+                        messageRepository.sendMessage(newMessage)
+                        messageText = ""
+                        loadMessages()
+
+                        if (messages.isNotEmpty()) {
+                            listState.scrollToItem(messages.lastIndex)
+                        }
+                    }
                 }
             }
         )
@@ -206,38 +244,42 @@ private fun ChatDayLabel(label: String) {
 }
 
 @Composable
-private fun MessageBubble(message: ChatMessage) {
+private fun MessageBubble(
+    text: String,
+    time: String,
+    isFromMe: Boolean
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = if (message.isFromMe) Arrangement.End else Arrangement.Start
+        horizontalArrangement = if (isFromMe) Arrangement.End else Arrangement.Start
     ) {
         Column(
-            horizontalAlignment = if (message.isFromMe) Alignment.End else Alignment.Start
+            horizontalAlignment = if (isFromMe) Alignment.End else Alignment.Start
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth(0.78f)
                     .background(
-                        color = if (message.isFromMe) ChatBlue else IncomingBubble,
+                        color = if (isFromMe) ChatBlue else IncomingBubble,
                         shape = RoundedCornerShape(
                             topStart = 18.dp,
                             topEnd = 18.dp,
-                            bottomStart = if (message.isFromMe) 18.dp else 4.dp,
-                            bottomEnd = if (message.isFromMe) 4.dp else 18.dp
+                            bottomStart = if (isFromMe) 18.dp else 4.dp,
+                            bottomEnd = if (isFromMe) 4.dp else 18.dp
                         )
                     )
                     .padding(horizontal = 14.dp, vertical = 10.dp)
             ) {
                 Text(
-                    text = message.text,
-                    color = if (message.isFromMe) Color.White else Color.Black,
+                    text = text,
+                    color = if (isFromMe) Color.White else Color.Black,
                     fontSize = 16.sp,
                     lineHeight = 21.sp
                 )
             }
 
             Text(
-                text = message.time,
+                text = time,
                 modifier = Modifier.padding(top = 4.dp, start = 4.dp, end = 4.dp),
                 fontSize = 12.sp,
                 color = Color.Gray
@@ -285,11 +327,10 @@ private fun ChatInputBar(
 
         IconButton(
             onClick = onSendClick,
-            modifier = Modifier
-                .background(
-                    color = if (value.isNotBlank()) ChatBlue else Color(0xFFBFD7FA),
-                    shape = CircleShape
-                )
+            modifier = Modifier.background(
+                color = if (value.isNotBlank()) ChatBlue else Color(0xFFBFD7FA),
+                shape = CircleShape
+            )
         ) {
             Icon(
                 imageVector = Icons.Default.Send,
@@ -300,10 +341,6 @@ private fun ChatInputBar(
     }
 }
 
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun ChatPagePreview() {
-    MaterialTheme {
-        ChatPage()
-    }
+private fun formatMessageTime(timestamp: Timestamp): String {
+    return SimpleDateFormat("h:mm a", Locale.getDefault()).format(timestamp.toDate())
 }

@@ -7,6 +7,7 @@ import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -21,6 +22,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.rememberNavController
 import com.example.cribswap.ui.Chat
 import com.example.cribswap.ui.Home
 import com.example.cribswap.ui.Saved
@@ -38,6 +41,7 @@ import com.example.cribswap.ui.theme.NavBarIndicator
 private val navItemList = listOf(
     NavItem("Home", Icons.Default.Home),
     NavItem("Saved", Icons.Default.Favorite),
+    NavItem("Listings", Icons.Default.List),
     NavItem("Chat", Icons.Default.Create),
     NavItem("Profile", Icons.Default.Face)
 )
@@ -59,7 +63,7 @@ fun CribSwapNavBar(
                         selected = selectedIndex == index,
                         onClick = {
                             selectedIndex = index
-                            if (index == 3) profileSubScreen = ProfileSubScreen.Profile
+                            if (index == 4) profileSubScreen = ProfileSubScreen.Profile
                         },
                         icon = { Icon(imageVector = navItem.icon, contentDescription = navItem.label) },
                         label = { Text(text = navItem.label) },
@@ -96,8 +100,19 @@ private fun ContentScreen(
     when (selectedIndex) {
         0 -> Home(modifier = modifier, filterViewModel = filterViewModel)
         1 -> Saved(modifier = modifier)
-        2 -> MessagesScreen(modifier = modifier)
-        3 -> when (profileSubScreen) {
+        2 -> {
+            // Listings section with its own navigation graph
+            val listingsNavController = rememberNavController()
+            NavHost(
+                navController = listingsNavController,
+                startDestination = ListingRoutes.FEED,
+                modifier = modifier
+            ) {
+                listingsNavGraph(listingsNavController)
+            }
+        }
+        3 -> MessagesScreen(modifier = modifier)
+        4 -> when (profileSubScreen) {
             ProfileSubScreen.Profile -> ProfileScreen(
                 onNavigateToSettings = { onProfileNavigate(ProfileSubScreen.Settings) },
                 onNavigateToPersonalDetail = { onProfileNavigate(ProfileSubScreen.PersonalDetail) }

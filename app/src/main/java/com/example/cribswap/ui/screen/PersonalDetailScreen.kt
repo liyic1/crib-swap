@@ -1,5 +1,6 @@
 package com.example.cribswap.ui.screen
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -8,24 +9,28 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.cribswap.navigation.CribSwapAppRouter
-import com.example.cribswap.navigation.Screen
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.cribswap.ui.components.BackButton
 import com.example.cribswap.ui.components.ValueBox
-
+import com.example.cribswap.viewmodel.ProfileViewModel
 
 @Composable
 fun PersonalDetailScreen(
-    onBack: () -> Unit = {}
+    onBack: () -> Unit = {},
+    profileViewModel: ProfileViewModel = viewModel()
 ) {
+    val user = profileViewModel.user.value
+    val isLoading = profileViewModel.isLoading.value
+
     Surface(
         color = Color.White,
         modifier = Modifier.fillMaxSize().padding(28.dp)
@@ -34,35 +39,39 @@ fun PersonalDetailScreen(
             modifier = Modifier.fillMaxWidth().padding(24.dp),
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                BackButton {
-                    onBack()
-                }
-                Spacer(modifier = Modifier.width(26.dp))
-                Text(text = "Personal Detail")
-                Spacer(modifier = Modifier.height(16.dp))
+                BackButton { onBack() }
+                Spacer(modifier = Modifier.width(16.dp))
+                Text(text = "Personal Details", style = MaterialTheme.typography.titleMedium)
             }
-            Spacer(modifier = Modifier.height(16.dp))
-            Text("Full Name")
-            ValueBox("John Doe")
-            Spacer(modifier = Modifier.height(16.dp))
-            Text("Username")
-            ValueBox("Johnny12")
-            Spacer(modifier = Modifier.height(16.dp))
-            Text("Email")
-            ValueBox("Johndoe@umn.edu")
-            Spacer(modifier = Modifier.height(16.dp))
-            Text("Phone Number")
-            ValueBox("+1 234 567 8910")
-            Spacer(modifier = Modifier.height(16.dp))
-            Text("Address")
-            ValueBox("45 New Avenue, New York")
-            Spacer(modifier = Modifier.height(16.dp))
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            if (isLoading) {
+                Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            } else if (user == null) {
+                Text("Could not load profile.", color = Color.Red)
+            } else {
+                Text("Full Name", style = MaterialTheme.typography.labelMedium, color = Color.Gray)
+                Spacer(modifier = Modifier.height(4.dp))
+                ValueBox(user.displayName.ifBlank { "—" })
+
+                Spacer(modifier = Modifier.height(16.dp))
+                Text("Email", style = MaterialTheme.typography.labelMedium, color = Color.Gray)
+                Spacer(modifier = Modifier.height(4.dp))
+                ValueBox(user.email.ifBlank { "—" })
+
+                Spacer(modifier = Modifier.height(16.dp))
+                Text("Phone Number", style = MaterialTheme.typography.labelMedium, color = Color.Gray)
+                Spacer(modifier = Modifier.height(4.dp))
+                ValueBox(user.phoneNumber.ifBlank { "Not set" })
+
+                Spacer(modifier = Modifier.height(16.dp))
+                Text("Address", style = MaterialTheme.typography.labelMedium, color = Color.Gray)
+                Spacer(modifier = Modifier.height(4.dp))
+                ValueBox(user.address.ifBlank { "Not set" })
+            }
         }
     }
-}
-
-@Preview
-@Composable
-fun DefaultPreviewOfPersonalDetailScreen() {
-    PersonalDetailScreen()
 }

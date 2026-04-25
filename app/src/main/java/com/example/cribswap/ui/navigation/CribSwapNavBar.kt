@@ -28,12 +28,12 @@ import com.example.cribswap.ui.filter.FilterViewModel
 import com.example.cribswap.ui.screen.PersonalDetailScreen
 import com.example.cribswap.ui.screen.ProfileScreen
 import com.example.cribswap.ui.screen.SettingsScreen
+import com.example.cribswap.ui.conversation.MessagesScreen
 import com.example.cribswap.ui.theme.NavBarBackground
 import com.example.cribswap.ui.theme.NavBarContentSelected
 import com.example.cribswap.ui.theme.NavBarContentUnselected
 import com.example.cribswap.ui.theme.NavBarIndicator
 
-enum class ProfileSubScreen { Profile, Settings, PersonalDetail }
 
 private val navItemList = listOf(
     NavItem("Home", Icons.Default.Home),
@@ -96,7 +96,7 @@ private fun ContentScreen(
     when (selectedIndex) {
         0 -> Home(modifier = modifier, filterViewModel = filterViewModel)
         1 -> Saved(modifier = modifier)
-        2 -> Chat(modifier = modifier)
+        2 -> MessagesScreen(modifier = modifier)
         3 -> when (profileSubScreen) {
             ProfileSubScreen.Profile -> ProfileScreen(
                 onNavigateToSettings = { onProfileNavigate(ProfileSubScreen.Settings) },

@@ -3,9 +3,9 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.google.services)
     alias(libs.plugins.google.firebase.crashlytics)
     id("io.gitlab.arturbosch.detekt")
+    alias(libs.plugins.google.services)
 }
 
 android {
@@ -61,7 +61,7 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.auth)
+    implementation("com.google.firebase:firebase-auth-ktx")
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.storage)
     detektPlugins("io.nlopez.compose.rules:detekt:0.4.22")

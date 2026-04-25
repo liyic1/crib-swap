@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,8 +32,10 @@ import com.example.cribswap.viewmodel.LoginViewModel
 
 @Composable
 fun LoginScreen(loginViewModel: LoginViewModel = viewModel()) {
-    Box(modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
         Surface(
             color = Color.White,
             modifier = Modifier.fillMaxSize().padding(28.dp)
@@ -44,37 +47,48 @@ fun LoginScreen(loginViewModel: LoginViewModel = viewModel()) {
                 NormalTextComponent("Welcome Back")
                 NormalTextComponent("Hello Again!")
                 Spacer(modifier = Modifier.height(16.dp))
+
                 MyTextField(
                     onTextSelected = { loginViewModel.onEvent(LoginUIEvent.EmailChanged(it)) },
                     labelValue = "School Email",
                     painterResource = painterResource(id = R.drawable.email),
                     errorStatus = loginViewModel.loginUIState.value.emailError
                 )
+
                 PasswordTextFieldComponent(
                     onTextSelected = { loginViewModel.onEvent(LoginUIEvent.PasswordChanged(it)) },
                     labelValue = "Password",
                     painterResource = painterResource(id = R.drawable.lock),
                     errorStatus = loginViewModel.loginUIState.value.passwordError
                 )
+
                 Spacer(modifier = Modifier.height(8.dp))
+
                 UnderlinedTextComponent(value = "Forgot Password?", onTextSelected = {
                     CribSwapAppRouter.navigateTo(Screen.ForgotPasswordScreen)
                 })
+
+                loginViewModel.loginError.value?.let { error ->
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = error, color = Color.Red)
+                }
+
                 Spacer(modifier = Modifier.height(24.dp))
 
                 ButtonComponent(
                     value = "Login",
-                    onButtonClicked = {
-                        loginViewModel.onEvent(LoginUIEvent.LoginButtonClicked)
-                    },
+                    onButtonClicked = { loginViewModel.onEvent(LoginUIEvent.LoginButtonClicked) },
                     isEnabled = loginViewModel.allValidatorPassed.value
                 )
+
                 DividerTextComponent()
+
                 ClickableLoginTextComponent(tryingToLogin = false, onTextSelected = {
                     CribSwapAppRouter.navigateTo(Screen.SignUpScreen)
                 })
             }
         }
+
         if (loginViewModel.loginInProgress.value) {
             CircularProgressIndicator()
         }

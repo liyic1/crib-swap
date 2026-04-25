@@ -7,10 +7,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.util.Calendar
 
-/**
- * ViewModel for onboarding preferences screen.
- * Collects user's initial preferences and converts them to FilterState.
- */
 class PreferencesViewModel(
     private val filterViewModel: FilterViewModel
 ) : ViewModel() {
@@ -33,10 +29,6 @@ class PreferencesViewModel(
         _prefs.value = _prefs.value.update()
     }
 
-    /**
-     * User completed onboarding - convert preferences to FilterState
-     * and apply to filter system.
-     */
     fun completeOnboarding() {
         val p = _prefs.value
         val initialState = FilterState(
@@ -57,10 +49,6 @@ class PreferencesViewModel(
     }
 }
 
-/**
- * Simplified state for preferences screen (subset of FilterState).
- * Only includes fields shown during onboarding.
- */
 data class PreferencesFormState(
     val priceMin: Float = 0f,
     val priceMax: Float = 3000f,

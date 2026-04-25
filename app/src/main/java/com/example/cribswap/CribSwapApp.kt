@@ -100,7 +100,6 @@ fun CribSwapApp() {
                         CribSwapNavBar(filterViewModel = filterViewModel)
                     } else {
                         PreferencesScreen(
-                            filterViewModel = filterViewModel,
                             preferencesViewModel = preferencesViewModel
                         )
                     }

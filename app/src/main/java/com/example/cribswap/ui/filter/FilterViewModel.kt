@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cribswap.data.model.Listing
 import com.example.cribswap.data.repo.SubleaseRepository
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.util.Calendar
@@ -13,6 +14,12 @@ class FilterViewModel(
     private val userLatitude: Double? = null,
     private val userLongitude: Double? = null
 ) : ViewModel() {
+
+    constructor() : this(
+        repository = SubleaseRepository(FirebaseFirestore.getInstance()),
+        userLatitude = null,
+        userLongitude = null
+    )
 
     private val currentYear: Int
         get() = Calendar.getInstance().get(Calendar.YEAR)

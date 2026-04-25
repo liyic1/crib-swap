@@ -11,6 +11,10 @@ class PreferencesViewModel(
     private val filterViewModel: FilterViewModel
 ) : ViewModel() {
 
+    constructor() : this(
+        filterViewModel = FilterViewModel()
+    )
+
     private val currentYear: Int
         get() = Calendar.getInstance().get(Calendar.YEAR)
 

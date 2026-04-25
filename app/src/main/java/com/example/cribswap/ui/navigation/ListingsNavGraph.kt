@@ -1,12 +1,10 @@
 package com.example.cribswap.ui.navigation
 
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.cribswap.ui.listings.*
-
-// ── Routes ────────────────────────────────────────────────────────────────────
 
 object ListingRoutes {
     const val FEED        = "listings/feed"
@@ -15,14 +13,6 @@ object ListingRoutes {
     const val MY_LISTINGS = "listings/mine"
 }
 
-// ── Nav graph extension ───────────────────────────────────────────────────────
-//
-// Add to your root NavHost:
-//
-//   NavHost(navController, startDestination = ListingRoutes.FEED) {
-//       listingsNavGraph(navController)
-//   }
-
 fun NavGraphBuilder.listingsNavGraph(navController: NavHostController) {
 
     composable(ListingRoutes.FEED) {
@@ -30,15 +20,21 @@ fun NavGraphBuilder.listingsNavGraph(navController: NavHostController) {
         ListingsScreen(
             viewModel = vm,
             onNavigateToDetail = { listing ->
-                vm.selectListing(listing)
+                vm.selectListing(listing)   // ← set listing BEFORE navigating
                 navController.navigate(ListingRoutes.DETAIL)
             },
-            onNavigateToCreate = { navController.navigate(ListingRoutes.CREATE) }
+            onNavigateToCreate = {
+                navController.navigate(ListingRoutes.CREATE)
+            }
         )
     }
 
     composable(ListingRoutes.DETAIL) {
-        val vm: ListingViewModel = viewModel()
+        // Share the SAME ViewModel instance from the back stack
+        val vm: ListingViewModel = navController
+            .getBackStackEntry(ListingRoutes.FEED)
+            .let { viewModel(it) }
+
         ListingDetailScreen(
             viewModel = vm,
             onNavigateBack = { navController.popBackStack() },
@@ -49,11 +45,16 @@ fun NavGraphBuilder.listingsNavGraph(navController: NavHostController) {
     }
 
     composable(ListingRoutes.CREATE) {
-        val vm: ListingViewModel = viewModel()
+        val vm: ListingViewModel = navController
+            .getBackStackEntry(ListingRoutes.FEED)
+            .let { viewModel(it) }
+
         CreateListingScreen(
             viewModel = vm,
             onNavigateBack  = { navController.popBackStack() },
-            onSubmitSuccess = { navController.popBackStack(ListingRoutes.FEED, inclusive = false) }
+            onSubmitSuccess = {
+                navController.popBackStack(ListingRoutes.FEED, inclusive = false)
+            }
         )
     }
 
@@ -66,7 +67,7 @@ fun NavGraphBuilder.listingsNavGraph(navController: NavHostController) {
                 vm.selectListing(listing)
                 navController.navigate(ListingRoutes.DETAIL)
             },
-            onNavigateToEdit   = { /* navController.navigate("listings/edit/${it.id}") */ }
+            onNavigateToEdit   = { }
         )
     }
 }

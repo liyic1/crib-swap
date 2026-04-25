@@ -1,13 +1,10 @@
 package com.example.cribswap.ui.listings
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.example.cribswap.data.model.Listing
-import com.example.cribswap.data.repo.ListingRepository
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 
 // ── UI State ──────────────────────────────────────────────────────────────────
 
@@ -36,12 +33,156 @@ data class CreateListingFormState(
     val errorMessage: String? = null
 )
 
+// ── Mock Data with real Unsplash apartment photos ─────────────────────────────
+
+private val MOCK_LISTINGS = mutableListOf(
+    Listing(
+        id = "sarah-listing-1",
+        userId = "test-user",
+        ownerName = "Sarah (Me)",
+        title = "Cozy 2BR near U of M",
+        description = "Bright corner unit a 10-min walk from campus. Hardwood floors, updated kitchen, in-unit laundry. Great natural light all day.",
+        rent = 1100.0,
+        address = "123 University Ave SE",
+        city = "Minneapolis",
+        state = "MN",
+        zipCode = "55414",
+        bedrooms = 2,
+        bathrooms = 1.0,
+        squareFeet = 820,
+        isFurnished = false,
+        petsAllowed = true,
+        utilitiesIncluded = false,
+        isActive = true,
+        photoUrls = listOf("https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80")
+    ),
+    Listing(
+        id = "listing-2",
+        userId = "user-2",
+        ownerName = "Priya S.",
+        title = "Modern Studio — Cedar-Riverside",
+        description = "Fully furnished studio in a high-rise. All utilities included. Steps from the light rail and campus shuttle stop.",
+        rent = 750.0,
+        address = "500 Cedar St",
+        city = "Minneapolis",
+        state = "MN",
+        zipCode = "55454",
+        bedrooms = 1,
+        bathrooms = 1.0,
+        squareFeet = 420,
+        isFurnished = true,
+        petsAllowed = false,
+        utilitiesIncluded = true,
+        isActive = true,
+        photoUrls = listOf("https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&q=80")
+    ),
+    Listing(
+        id = "listing-3",
+        userId = "user-3",
+        ownerName = "Jordan M.",
+        title = "Cozy 3BR House — Dinkytown",
+        description = "Spacious house with a backyard, front porch, and dedicated parking for 2 cars. Perfect for a group of 3 students.",
+        rent = 1500.0,
+        address = "14th Ave SE",
+        city = "Minneapolis",
+        state = "MN",
+        zipCode = "55414",
+        bedrooms = 3,
+        bathrooms = 2.0,
+        squareFeet = 1200,
+        isFurnished = false,
+        petsAllowed = true,
+        utilitiesIncluded = false,
+        isActive = true,
+        photoUrls = listOf("https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&q=80")
+    ),
+    Listing(
+        id = "listing-4",
+        userId = "user-4",
+        ownerName = "Sam T.",
+        title = "1BR with Gym & Rooftop",
+        description = "Modern building with a rooftop deck and fitness center. Quiet floor, fast WiFi in common areas, controlled entry.",
+        rent = 995.0,
+        address = "300 2nd Ave S",
+        city = "Minneapolis",
+        state = "MN",
+        zipCode = "55401",
+        bedrooms = 1,
+        bathrooms = 1.0,
+        squareFeet = 550,
+        isFurnished = false,
+        petsAllowed = false,
+        utilitiesIncluded = false,
+        isActive = true,
+        photoUrls = listOf("https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80")
+    ),
+    Listing(
+        id = "listing-5",
+        userId = "user-5",
+        ownerName = "Aisha K.",
+        title = "Sunny 1BR — Uptown",
+        description = "Charming 1BR in the heart of Uptown. Walk to restaurants, coffee shops, and Lake Calhoun.",
+        rent = 850.0,
+        address = "2900 Hennepin Ave",
+        city = "Minneapolis",
+        state = "MN",
+        zipCode = "55408",
+        bedrooms = 1,
+        bathrooms = 1.0,
+        squareFeet = 600,
+        isFurnished = true,
+        petsAllowed = false,
+        utilitiesIncluded = true,
+        isActive = true,
+        photoUrls = listOf("https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800&q=80")
+    ),
+    Listing(
+        id = "listing-6",
+        userId = "user-6",
+        ownerName = "Marcus W.",
+        title = "Spacious 2BR — Northeast",
+        description = "Renovated 2BR in the arts district. Exposed brick, open floor plan, rooftop access. Walking distance to breweries and cafes.",
+        rent = 1250.0,
+        address = "789 Central Ave NE",
+        city = "Minneapolis",
+        state = "MN",
+        zipCode = "55413",
+        bedrooms = 2,
+        bathrooms = 1.0,
+        squareFeet = 950,
+        isFurnished = false,
+        petsAllowed = true,
+        utilitiesIncluded = false,
+        isActive = true,
+        photoUrls = listOf("https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80")
+    ),
+    Listing(
+        id = "listing-7",
+        userId = "user-7",
+        ownerName = "Lena P.",
+        title = "Furnished Studio — Downtown",
+        description = "Sleek fully furnished studio in the heart of downtown. Floor-to-ceiling windows with city views. Perfect for one person.",
+        rent = 900.0,
+        address = "100 Washington Ave S",
+        city = "Minneapolis",
+        state = "MN",
+        zipCode = "55401",
+        bedrooms = 1,
+        bathrooms = 1.0,
+        squareFeet = 480,
+        isFurnished = true,
+        petsAllowed = false,
+        utilitiesIncluded = true,
+        isActive = true,
+        photoUrls = listOf("https://images.unsplash.com/photo-1536376072261-38c75010e6c9?w=800&q=80")
+    )
+)
+
 // ── ViewModel ─────────────────────────────────────────────────────────────────
 
-class ListingViewModel(
-    private val repo: ListingRepository = ListingRepository(),
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
-) : ViewModel() {
+class ListingViewModel : ViewModel() {
+
+    private val auth = FirebaseAuth.getInstance()
 
     private val _feedState = MutableStateFlow<ListingUiState>(ListingUiState.Loading)
     val feedState: StateFlow<ListingUiState> = _feedState.asStateFlow()
@@ -60,83 +201,41 @@ class ListingViewModel(
 
     init { loadListings() }
 
-    // ── Feed ──────────────────────────────────────────────────────────────────
-
     fun loadListings() {
-        viewModelScope.launch {
-            _feedState.value = ListingUiState.Loading
-            try {
-                repo.getAllListings().collect { listings ->
-                    _feedState.value = ListingUiState.Success(listings)
-                }
-            } catch (e: Exception) {
-                _feedState.value = ListingUiState.Error(e.message ?: "Failed to load listings")
-            }
-        }
+        _feedState.value = ListingUiState.Success(MOCK_LISTINGS.toList())
     }
 
-    /** Load only the current signed-in user's listings (for My Listings screen). */
     fun loadMyListings() {
-        val uid = auth.currentUser?.uid ?: run {
-            _feedState.value = ListingUiState.Error("Not signed in")
-            return
-        }
-        viewModelScope.launch {
-            _feedState.value = ListingUiState.Loading
-            try {
-                repo.getListingsByUser(uid).collect { listings ->
-                    _feedState.value = ListingUiState.Success(listings)
-                }
-            } catch (e: Exception) {
-                _feedState.value = ListingUiState.Error(e.message ?: "Failed to load your listings")
-            }
-        }
+        val myListings = MOCK_LISTINGS.filter { it.userId == "test-user" }
+        _feedState.value = ListingUiState.Success(myListings)
     }
-
-    // ── Filters ───────────────────────────────────────────────────────────────
 
     fun applyFilters(maxRent: Double?, bedrooms: Int?) {
         _maxRentFilter.value = maxRent
         _bedroomsFilter.value = bedrooms
-        viewModelScope.launch {
-            _feedState.value = ListingUiState.Loading
-            try {
-                repo.getFilteredListings(maxRent, bedrooms).collect { listings ->
-                    _feedState.value = ListingUiState.Success(listings)
-                }
-            } catch (e: Exception) {
-                _feedState.value = ListingUiState.Error(e.message ?: "Filter failed")
-            }
+        val filtered = MOCK_LISTINGS.filter { listing ->
+            (maxRent == null || listing.rent <= maxRent) &&
+                    (bedrooms == null || listing.bedrooms == bedrooms)
         }
+        _feedState.value = ListingUiState.Success(filtered)
     }
 
-    fun clearFilters() = applyFilters(null, null)
-
-    // ── Detail ────────────────────────────────────────────────────────────────
+    fun clearFilters() {
+        _maxRentFilter.value = null
+        _bedroomsFilter.value = null
+        _feedState.value = ListingUiState.Success(MOCK_LISTINGS.toList())
+    }
 
     fun selectListing(listing: Listing) { _selectedListing.value = listing }
-    fun clearSelectedListing()          { _selectedListing.value = null }
-
+    fun clearSelectedListing() { _selectedListing.value = null }
     fun loadListingById(id: String) {
-        viewModelScope.launch {
-            _selectedListing.value = repo.getListingById(id)
-        }
+        _selectedListing.value = MOCK_LISTINGS.find { it.id == id }
     }
-
-    // ── Delete ────────────────────────────────────────────────────────────────
 
     fun deactivateListing(listingId: String) {
-        viewModelScope.launch {
-            try {
-                repo.deactivateListing(listingId)
-                loadMyListings()
-            } catch (e: Exception) {
-                _feedState.value = ListingUiState.Error(e.message ?: "Could not remove listing")
-            }
-        }
+        MOCK_LISTINGS.removeAll { it.id == listingId }
+        loadListings()
     }
-
-    // ── Create form ───────────────────────────────────────────────────────────
 
     fun onTitleChange(v: String)       { _formState.update { it.copy(title = v) } }
     fun onDescriptionChange(v: String) { _formState.update { it.copy(description = v) } }
@@ -172,17 +271,13 @@ class ListingViewModel(
             return
         }
 
-        val user = auth.currentUser ?: run {
-            _formState.update { it.copy(errorMessage = "You must be logged in to post.") }
-            return
-        }
-
         _formState.update { it.copy(isSubmitting = true, errorMessage = null) }
 
         val newListing = Listing(
-            userId            = user.uid,
-            ownerName         = user.displayName ?: "Anonymous",
-            ownerPhotoUrl     = user.photoUrl?.toString(),
+            id                = "new-${System.currentTimeMillis()}",
+            userId            = auth.currentUser?.uid ?: "test-user",
+            ownerName         = auth.currentUser?.displayName ?: "Sarah (Me)",
+            ownerPhotoUrl     = auth.currentUser?.photoUrl?.toString(),
             title             = form.title.trim(),
             description       = form.description.trim(),
             rent              = rentDouble,
@@ -197,19 +292,13 @@ class ListingViewModel(
             petsAllowed       = form.petsAllowed,
             utilitiesIncluded = form.utilitiesIncluded,
             createdAt         = Timestamp.now(),
-            isActive          = true
+            isActive          = true,
+            photoUrls         = listOf("https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80")
         )
 
-        viewModelScope.launch {
-            try {
-                repo.createListing(newListing)
-                _formState.value = CreateListingFormState(submitSuccess = true)
-            } catch (e: Exception) {
-                _formState.update {
-                    it.copy(isSubmitting = false, errorMessage = e.message ?: "Submission failed.")
-                }
-            }
-        }
+        MOCK_LISTINGS.add(0, newListing)
+        _feedState.value = ListingUiState.Success(MOCK_LISTINGS.toList())
+        _formState.value = CreateListingFormState(submitSuccess = true)
     }
 
     fun resetForm() { _formState.value = CreateListingFormState() }

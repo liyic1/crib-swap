@@ -1,7 +1,16 @@
 package com.example.cribswap.ui.listings
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -11,10 +20,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -25,7 +39,16 @@ fun CreateListingScreen(
 ) {
     val form by viewModel.formState.collectAsState()
 
-    // Navigate away when submission succeeds
+    // Selected image URIs (local, before upload)
+    var selectedImages by remember { mutableStateOf<List<Uri>>(emptyList()) }
+
+    // Image picker launcher — allows multiple images
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetMultipleContents()
+    ) { uris ->
+        selectedImages = (selectedImages + uris).take(6) // max 6 photos
+    }
+
     LaunchedEffect(form.submitSuccess) {
         if (form.submitSuccess) {
             viewModel.resetForm()
@@ -66,15 +89,100 @@ fun CreateListingScreen(
                         modifier = Modifier.padding(12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Default.Warning, contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onErrorContainer)
+                        Icon(
+                            Icons.Default.Warning,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onErrorContainer
+                        )
                         Spacer(Modifier.width(8.dp))
                         Text(error, color = MaterialTheme.colorScheme.onErrorContainer)
                     }
                 }
             }
 
-            // ─── Section: Basic Info ──────────────────────────────────────────
+            // ── Section: Photos ───────────────────────────────────────────────
+            SectionHeader("Photos")
+            Text(
+                "Add up to 6 photos of your place",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                // Show selected images
+                items(selectedImages) { uri ->
+                    Box(
+                        modifier = Modifier
+                            .size(100.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                    ) {
+                        AsyncImage(
+                            model = uri,
+                            contentDescription = "Selected photo",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                        // Remove button
+                        IconButton(
+                            onClick = {
+                                selectedImages = selectedImages.filter { it != uri }
+                            },
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .size(24.dp)
+                                .background(Color.Black.copy(alpha = 0.5f), CircleShape)
+                        ) {
+                            Icon(
+                                Icons.Default.Close,
+                                contentDescription = "Remove photo",
+                                tint = Color.White,
+                                modifier = Modifier.size(14.dp)
+                            )
+                        }
+                    }
+                }
+
+                // Add photo button (only show if less than 6)
+                if (selectedImages.size < 6) {
+                    item {
+                        Surface(
+                            modifier = Modifier
+                                .size(100.dp)
+                                .clip(RoundedCornerShape(10.dp))
+                                .clickable { imagePickerLauncher.launch("image/*") },
+                            shape = RoundedCornerShape(10.dp),
+                            color = MaterialTheme.colorScheme.surfaceVariant,
+                            border = BorderStroke(
+                                1.dp,
+                                MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
+                            )
+                        ) {
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Icon(
+                                    Icons.Default.AddAPhoto,
+                                    contentDescription = "Add photo",
+                                    modifier = Modifier.size(28.dp),
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                                Spacer(Modifier.height(4.dp))
+                                Text(
+                                    "Add photo",
+                                    fontSize = 11.sp,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            // ── Section: Basic Info ───────────────────────────────────────────
             SectionHeader("Basic Info")
 
             OutlinedTextField(
@@ -129,7 +237,7 @@ fun CreateListingScreen(
                 singleLine = true
             )
 
-            // ─── Section: Location ────────────────────────────────────────────
+            // ── Section: Location ─────────────────────────────────────────────
             SectionHeader("Location")
 
             OutlinedTextField(
@@ -170,7 +278,7 @@ fun CreateListingScreen(
                 singleLine = true
             )
 
-            // ─── Section: Amenities ───────────────────────────────────────────
+            // ── Section: Amenities ────────────────────────────────────────────
             SectionHeader("Amenities")
 
             AmenityToggleRow(
@@ -192,22 +300,24 @@ fun CreateListingScreen(
                 onToggle = viewModel::onUtilitiesToggle
             )
 
-            // ─── Section: Description ─────────────────────────────────────────
+            // ── Section: Description ──────────────────────────────────────────
             SectionHeader("Description")
 
             OutlinedTextField(
                 value = form.description,
                 onValueChange = viewModel::onDescriptionChange,
                 label = { Text("Tell renters about this place") },
-                modifier = Modifier.fillMaxWidth().height(140.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(140.dp),
                 maxLines = 6
             )
 
-            // ─── Submit ───────────────────────────────────────────────────────
+            // ── Submit ────────────────────────────────────────────────────────
             Spacer(Modifier.height(8.dp))
 
             Button(
-                onClick = viewModel::submitListing,
+                onClick = { viewModel.submitListing() },
                 enabled = !form.isSubmitting,
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp)
@@ -232,8 +342,6 @@ fun CreateListingScreen(
     }
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
 @Composable
 private fun SectionHeader(title: String) {
     Text(
@@ -257,8 +365,12 @@ private fun AmenityToggleRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(icon, contentDescription = null, modifier = Modifier.size(20.dp),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant)
+            Icon(
+                icon,
+                contentDescription = null,
+                modifier = Modifier.size(20.dp),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
             Spacer(Modifier.width(10.dp))
             Text(label, style = MaterialTheme.typography.bodyMedium)
         }

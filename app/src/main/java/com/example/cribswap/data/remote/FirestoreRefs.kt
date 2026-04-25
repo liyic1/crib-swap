@@ -3,23 +3,22 @@ package com.example.cribswap.data.remote
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 
+/**
+ * Helper function that returns the correct firebase reference
+ * prevents string typos and keeps all the paths in one place
+ */
 object FirestoreRefs {
 
-    private val db get() = FirebaseFirestore.getInstance()
+    fun conversations(db: FirebaseFirestore): CollectionReference {
+        return db.collection("conversations")
+    }
 
-    // ── Top-level collections ─────────────────────────────────────────────────
-    val listings      get() = db.collection("listings")
-    val users         get() = db.collection("users")
-    val conversations get() = db.collection("conversations")
-
-    // ── Sub-collection helpers ────────────────────────────────────────────────
-    fun messages(conversationId: String): CollectionReference =
-        conversations.document(conversationId).collection("messages")
-
-    fun savedListings(userId: String): CollectionReference =
-        users.document(userId).collection("savedListings")
-
-    // ── Document helpers ──────────────────────────────────────────────────────
-    fun listing(listingId: String) = listings.document(listingId)
-    fun user(userId: String)       = users.document(userId)
+    fun messages(
+        db: FirebaseFirestore,
+        conversationId: String
+    ): CollectionReference {
+        return conversations(db)
+            .document(conversationId)
+            .collection("messages")
+    }
 }

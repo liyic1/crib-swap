@@ -3,23 +3,16 @@ package com.example.cribswap.ui.filter
 import com.google.firebase.Timestamp
 import java.util.Calendar
 
-/**
- * Filter criteria for sublease listings.
- *
- * IMPORTANT: Some UI fields (laundry, parking, roommates, buildingTypes)
- * are NOT in the Listing data model and will be ignored until backend schema updates.
- */
 data class FilterState(
-    // ── Supported Filters (match Listing model) ──────────────────────────────
+    // match listings data model
     val priceMin: Float = 0f,
     val priceMax: Float = 3000f,
     val locationQuery: String = "",
     val distanceMiles: Float = 5f,
 
-    // Bedrooms: stored as Int in Firestore (0=Studio, 1-4=bedrooms, 5=4+)
+
     val bedrooms: List<Int> = emptyList(),
 
-    // Bathrooms: stored as Double in Firestore (0.5, 1.0, 1.5, 2.0, 2.5, 3.0+)
     val bathrooms: List<Double> = emptyList(),
 
     val leaseStartMonth: String? = null,
@@ -30,17 +23,13 @@ data class FilterState(
     val furnished: Boolean = false,
     val photosRequired: Boolean = false,
 
-    // ── Unsupported Filters (not in Listing model yet) ──────────────────────
-    // These are kept for UI compatibility but won't filter results
+    // not in listing model yet so maybe just delete later
     val inUnitLaundry: Boolean = false,      // TODO: Add to Listing model
     val parking: Boolean = false,            // TODO: Add to Listing model
     val roommates: List<Int> = emptyList(),  // TODO: Add to Listing model
     val buildingTypes: List<String> = emptyList()  // TODO: Add to Listing model
 ) {
-    /**
-     * Convert month/year selections to Firebase Timestamps for querying.
-     * Returns null if no month is selected.
-     */
+
     fun getLeaseStartTimestamp(): Timestamp? {
         if (leaseStartMonth == null) return null
         val calendar = Calendar.getInstance().apply {
@@ -86,9 +75,6 @@ data class FilterState(
     }
 }
 
-/**
- * Helper to convert UI bedroom strings to Firestore Int values.
- */
 object BedroomMapper {
     fun stringToInt(bedroom: String): Int = when (bedroom) {
         "Studio" -> 0
@@ -103,12 +89,9 @@ object BedroomMapper {
     }
 }
 
-/**
- * Helper to convert UI bathroom strings to Firestore Double values.
- */
 object BathroomMapper {
     fun stringToDouble(bathroom: String): Double = when (bathroom) {
-        "3+" -> 3.5  // Store 3+ as 3.5 to allow filtering >= 3.0
+        "3+" -> 3.5
         else -> bathroom.toDoubleOrNull() ?: 1.0
     }
 

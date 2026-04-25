@@ -29,6 +29,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import androidx.compose.material.icons.filled.AddAPhoto
+import androidx.compose.material.icons.filled.AttachMoney
+import androidx.compose.material.icons.filled.Bed
+import androidx.compose.material.icons.filled.Bathtub
+import androidx.compose.material.icons.filled.Chair
+import androidx.compose.material.icons.filled.Pets
+import androidx.compose.material.icons.filled.Bolt
+import androidx.compose.material.icons.filled.Publish
+import coil.compose.AsyncImage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

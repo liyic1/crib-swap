@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.google.firebase.crashlytics)
+    id("io.gitlab.arturbosch.detekt")
     alias(libs.plugins.google.services)
 }
 
@@ -41,7 +43,7 @@ android {
 }
 
 dependencies {
-    // Core Android
+    implementation("androidx.navigation:navigation-compose:2.8.9")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -50,7 +52,7 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(platform(libs.androidx.compose.bom))
 
-    // Compose UI
+    implementation(libs.firebase.crashlytics)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
@@ -77,6 +79,8 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.storage)
+
+    detektPlugins("io.nlopez.compose.rules:detekt:0.4.22")
 
     // Tests
     testImplementation(libs.junit)

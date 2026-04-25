@@ -13,7 +13,6 @@ import com.example.cribswap.ui.theme.CribSwapTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
             CribSwapTheme {
                 val navController = rememberNavController()

@@ -21,4 +21,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "Crib Swap"
 include(":app")
- 

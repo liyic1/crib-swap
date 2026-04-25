@@ -21,7 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,7 +33,6 @@ import com.example.cribswap.data.model.Conversation
 import com.example.cribswap.data.repo.ConversationRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -61,7 +59,6 @@ fun ConversationPage(
     val auth = remember { FirebaseAuth.getInstance() }
     val conversationRepository = remember { ConversationRepository(db, auth) }
     val conversations = remember { mutableStateListOf<Conversation>() }
-    val scope = rememberCoroutineScope()
 
     LaunchedEffect(startOtherUserId, startListingId) {
         if (startOtherUserId != null) {
@@ -109,24 +106,7 @@ fun ConversationPage(
             }
 
             IconButton(
-                onClick = {
-                    scope.launch {
-                        val conversationId = conversationRepository.getOrCreateConversation(
-                            otherUserId = "test-seller-1",
-                            listingId = "test-listing-1"
-                        )
-
-                        conversations.clear()
-                        conversations.addAll(conversationRepository.getConversation())
-
-                        onConversationClick(
-                            conversationId,
-                            "Test Seller"
-                        )
-                    }
-
-                    onNewChatClick()
-                },
+                onClick = onNewChatClick,
                 modifier = Modifier
                     .clip(CircleShape)
                     .background(Color(0xFFEAF3FF))

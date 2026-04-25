@@ -15,35 +15,50 @@ class ConversationRepository(
     private val db: FirebaseFirestore,
     private val auth: FirebaseAuth
 ) {
-    suspend fun createConversation(otherUserId: String): String {
-        //Get the current logged-in user's UID from FirebaseAuth
-        val myUid = auth.currentUser?.uid ?: error("Not signed in")
-        //Store participants as a stable sorted list.
-        //Sorting helps avoid duplicates caused by different order.
+    suspend fun getOrCreateConversation(
+        otherUserId: String,
+        listingId: String? = null
+    ): String {
+        // Get the current logged-in user's UID from FirebaseAuth.
+        // Temporary fallback lets us test messaging before login is finished.
+        val myUid = auth.currentUser?.uid ?: "test-buyer-1"
+
+        // Store participants as a stable sorted list.
+        // Sorting helps avoid duplicates caused by different order.
         val participants = listOf(myUid, otherUserId).sorted()
 
-        val existing = FirestoreRefs.conversations(db)
+        var query = FirestoreRefs.conversations(db)
             .whereEqualTo("participants", participants)
-            .get()
-            .await()
+
+        // If this conversation comes from a listing, also match by listingId.
+        // This prevents different listings with the same seller from sharing one chat.
+        if (listingId != null) {
+            query = query.whereEqualTo("listingId", listingId)
+        }
+
+        val existing = query.get().await()
 
         if (!existing.isEmpty) {
             return existing.documents.first().id
         }
 
-        //Create a new document with an auto-generated ID
+        // Create a new document with an auto-generated ID.
         val doc = FirestoreRefs.conversations(db).document()
-        //Create the Conversation object that will be saved to Firestore
+
+        // Create the Conversation object that will be saved to Firestore.
         val data = Conversation(
             id = doc.id,
             participants = participants,
+            listingId = listingId,
             createdAt = Timestamp.now(),
             lastMessage = "",
             lastMessageAt = null
         )
-        //Write the object to Firestore (wait until it finishes)
+
+        // Write the object to Firestore and wait until it finishes.
         doc.set(data).await()
-        //return conversation id
+
+        // Return conversation id.
         return doc.id
     }
 
@@ -55,17 +70,18 @@ class ConversationRepository(
      */
     suspend fun getConversation(): List<Conversation>{
         // get current user
-        val myUid = auth.currentUser?.uid ?: error("not signed in")
+//        val myUid = auth.currentUser?.uid ?: error("not signed in")
+        val myUid = auth.currentUser?.uid ?: "test-buyer-1"
         //Query the conversation collection
         val query = FirestoreRefs.conversations(db)
             .whereArrayContains("participants", myUid) //find convo containing this user
-            .orderBy("createdAt") //Sort convo by creation time
+            //.orderBy("lastMessageAt") //Sort convo by creation time
             .get() //execute query
             .await() // Wait until fireStore responds
 
         //Convert Firestore Documents to Conversation Objects
         return query.documents.mapNotNull { doc ->
-            doc.toObject(Conversation::class.java)
+            doc.toObject(Conversation::class.java)?.copy(id = doc.id)
         }
 
     }
@@ -75,7 +91,7 @@ class ConversationRepository(
             .get()
             .await()
 
-        return doc.toObject(Conversation::class.java)
+        return doc.toObject(Conversation::class.java)?.copy(id = doc.id)
     }
 
     suspend fun updateLastMessage(

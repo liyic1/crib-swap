@@ -12,11 +12,12 @@ data class Conversation(
     @DocumentId val id: String = "",
     //Store list of userId in on conversation, Ex. [myUserId, otherUserId]
     val participants: List<String> = emptyList(),
+    val listingId: String? = null,
     //Store the latest message, so we don't have to fetch it everytime
     val lastMessage: String? = "",
     // time of the last message
     val lastMessageAt: Timestamp? = null,
     //when the conversation was created
-    val createdAt: Timestamp? = null
+    val createdAt: Timestamp = Timestamp.now()
     // set everything as a default to prevent crashes like when a field doesn't exist
 )

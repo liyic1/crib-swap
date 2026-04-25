@@ -47,45 +47,22 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
-
-    // Compose BOM
     implementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-
     implementation(libs.firebase.crashlytics)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
-    implementation("androidx.compose.material:material-icons-extended")
+    implementation(libs.lifecycle.viewmodel.compose)
     debugImplementation(libs.androidx.compose.ui.tooling)
-
-    // Navigation
-    implementation(libs.androidx.navigation.compose)
-
-    // ViewModel + Lifecycle
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation(libs.androidx.lifecycle.runtime.compose)
-
-    // Coroutines
-    implementation(libs.kotlinx.coroutines.android)
-    implementation(libs.kotlinx.coroutines.play.services)
-
-    // Image loading
-    implementation(libs.coil.compose)
-
-    // Firebase
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.auth)
-    implementation(libs.firebase.firestore)
-    implementation(libs.firebase.storage)
-
-    detektPlugins("io.nlopez.compose.rules:detekt:0.4.22")
-
-    // Tests
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+    implementation(platform(libs.firebase.bom))
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.storage)
+    detektPlugins("io.nlopez.compose.rules:detekt:0.4.22")
 }

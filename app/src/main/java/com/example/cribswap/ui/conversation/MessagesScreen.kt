@@ -11,22 +11,26 @@ import androidx.compose.ui.Modifier
 fun MessagesScreen(
     modifier: Modifier = Modifier
 ) {
-    var selectedConversation by remember { mutableStateOf<ConversationPreview?>(null) }
+    var selectedConversationId by remember { mutableStateOf<String?>(null) }
+    var selectedUserName by remember { mutableStateOf("") }
 
-    if (selectedConversation == null) {
+    if (selectedConversationId == null) {
         ConversationPage(
             modifier = modifier,
-            onConversationClick = { convo ->
-                selectedConversation = convo
+            onConversationClick = { conversationId, userName ->
+                selectedConversationId = conversationId
+                selectedUserName = userName
             }
         )
     } else {
         ChatPage(
             modifier = modifier,
-            userName = selectedConversation!!.name,
+            conversationId = selectedConversationId!!,
+            userName = selectedUserName,
             userStatus = "Usually replies quickly",
             onBackClick = {
-                selectedConversation = null
+                selectedConversationId = null
+                selectedUserName = ""
             }
         )
     }

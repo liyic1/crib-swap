@@ -18,15 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.cribswap.ui.theme.CribSwapBlue
-import com.example.cribswap.ui.theme.CribSwapBlueLight
-import com.example.cribswap.ui.theme.DividerColor
-import com.example.cribswap.ui.theme.SurfaceLight
-import com.example.cribswap.ui.theme.TextPrimary
-import com.example.cribswap.ui.theme.TextSecondary
-
-private fun <T> List<T>.toggle(item: T): List<T> =
-    if (contains(item)) this - item else this + item
+import com.example.cribswap.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,7 +37,7 @@ fun FilterBottomSheet(
         dragHandle = null
     ) {
         Column(Modifier.fillMaxWidth()) {
-
+            // ── Header ───────────────────────────────────────────────────────
             Box(
                 Modifier
                     .fillMaxWidth()
@@ -61,11 +53,14 @@ fun FilterBottomSheet(
                 )
                 Text(
                     "Filter Listings",
-                    color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold,
+                    color = Color.White,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
                     modifier = Modifier.align(Alignment.TopCenter).padding(top = 16.dp)
                 )
             }
 
+            // ── Filter Content ───────────────────────────────────────────────
             Column(
                 Modifier
                     .fillMaxWidth()
@@ -74,17 +69,22 @@ fun FilterBottomSheet(
                     .padding(horizontal = 20.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
+                // Price Range
                 FilterSection("Price Range") {
                     Box(Modifier.fillMaxWidth().height(22.dp)) {
                         Text(
                             "$${draft.priceMin.toInt()} – $${draft.priceMax.toInt()} / mo",
-                            fontSize = 13.sp, color = CribSwapBlue, fontWeight = FontWeight.SemiBold
+                            fontSize = 13.sp,
+                            color = CribSwapBlue,
+                            fontWeight = FontWeight.SemiBold
                         )
                     }
                     RangeSlider(
                         value = draft.priceMin..draft.priceMax,
                         onValueChange = {
-                            viewModel.updateDraft { copy(priceMin = it.start, priceMax = it.endInclusive) }
+                            viewModel.updateDraft {
+                                copy(priceMin = it.start, priceMax = it.endInclusive)
+                            }
                         },
                         valueRange = 0f..5000f,
                         colors = SliderDefaults.colors(
@@ -98,32 +98,46 @@ fun FilterBottomSheet(
 
                 FilterDivider()
 
+                // Location
                 FilterSection("Location") {
                     OutlinedTextField(
                         value = draft.locationQuery,
-                        onValueChange = { viewModel.updateDraft { copy(locationQuery = it) } },
+                        onValueChange = {
+                            viewModel.updateDraft { copy(locationQuery = it) }
+                        },
                         placeholder = { Text("Address or zip code", fontSize = 13.sp) },
                         leadingIcon = {
-                            Icon(Icons.Default.LocationOn, null, tint = CribSwapBlue,
-                                modifier = Modifier.size(18.dp))
+                            Icon(
+                                Icons.Default.LocationOn,
+                                null,
+                                tint = CribSwapBlue,
+                                modifier = Modifier.size(18.dp)
+                            )
                         },
                         singleLine = true,
                         shape = RoundedCornerShape(10.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = CribSwapBlue, unfocusedBorderColor = DividerColor),
+                            focusedBorderColor = CribSwapBlue,
+                            unfocusedBorderColor = DividerColor
+                        ),
                         modifier = Modifier.fillMaxWidth()
                     )
                     Spacer(Modifier.height(10.dp))
                     Box(Modifier.fillMaxWidth().height(22.dp)) {
                         Text(
                             "Within ${draft.distanceMiles.toInt()} mile${if (draft.distanceMiles > 1f) "s" else ""}",
-                            fontSize = 13.sp, color = CribSwapBlue, fontWeight = FontWeight.SemiBold
+                            fontSize = 13.sp,
+                            color = CribSwapBlue,
+                            fontWeight = FontWeight.SemiBold
                         )
                     }
                     Slider(
                         value = draft.distanceMiles,
-                        onValueChange = { viewModel.updateDraft { copy(distanceMiles = it) } },
-                        valueRange = 1f..50f, steps = 48,
+                        onValueChange = {
+                            viewModel.updateDraft { copy(distanceMiles = it) }
+                        },
+                        valueRange = 1f..50f,
+                        steps = 48,
                         colors = SliderDefaults.colors(
                             thumbColor = CribSwapBlue,
                             activeTrackColor = CribSwapBlue,
@@ -135,43 +149,80 @@ fun FilterBottomSheet(
 
                 FilterDivider()
 
+                // Bedrooms - UI shows strings, ViewModel converts to Int
                 FilterSection("Bedrooms") {
+                    val bedroomOptions = listOf("Studio", "1", "2", "3", "4+")
+                    val selectedBedrooms = draft.bedrooms.map {
+                        BedroomMapper.intToString(it)
+                    }
+
                     SelectionButtonRow(
-                        options = listOf("Studio", "1", "2", "3", "4+"),
-                        selected = draft.bedrooms,
-                        onToggle = { viewModel.updateDraft { copy(bedrooms = bedrooms.toggle(it)) } }
+                        options = bedroomOptions,
+                        selected = selectedBedrooms,
+                        onToggle = { viewModel.toggleBedroom(it) }
                     )
                 }
 
                 FilterDivider()
 
+                // Bathrooms - UI shows strings, ViewModel converts to Double
                 FilterSection("Bathrooms") {
+                    val bathroomOptions = listOf("0.5", "1", "1.5", "2", "2.5", "3+")
+                    val selectedBathrooms = draft.bathrooms.map {
+                        BathroomMapper.doubleToString(it)
+                    }
+
                     SelectionButtonRow(
-                        options = listOf("0.5", "1", "1.5", "2", "2.5", "3+"),
-                        selected = draft.bathrooms,
-                        onToggle = { viewModel.updateDraft { copy(bathrooms = bathrooms.toggle(it)) } }
+                        options = bathroomOptions,
+                        selected = selectedBathrooms,
+                        onToggle = { viewModel.toggleBathroom(it) }
                     )
                 }
 
                 FilterDivider()
 
+                // Roommates (not yet in Listing model - show with warning)
                 FilterSection("Roommates") {
+                    val roommateOptions = listOf("0", "1", "2", "3", "4+")
+                    val selectedRoommates = draft.roommates.map {
+                        when (it) {
+                            5 -> "4+"
+                            else -> it.toString()
+                        }
+                    }
+
                     SelectionButtonRow(
-                        options = listOf("0", "1", "2", "3", "4+"),
-                        selected = draft.roommates,
-                        onToggle = { viewModel.updateDraft { copy(roommates = roommates.toggle(it)) } }
+                        options = roommateOptions,
+                        selected = selectedRoommates,
+                        onToggle = { viewModel.toggleRoommate(it) }
+                    )
+
+                    // Warning badge
+                    Text(
+                        "⚠️ Coming soon - not yet filtering results",
+                        fontSize = 11.sp,
+                        color = TextSecondary,
+                        modifier = Modifier.padding(top = 4.dp)
                     )
                 }
 
                 FilterDivider()
 
+                // Lease Term
                 FilterSection("Lease Term") {
-                    Text("Start", fontSize = 12.sp, color = TextSecondary, fontWeight = FontWeight.Medium)
+                    Text(
+                        "Start",
+                        fontSize = 12.sp,
+                        color = TextSecondary,
+                        fontWeight = FontWeight.Medium
+                    )
                     Spacer(Modifier.height(6.dp))
                     MonthYearPicker(
                         selectedMonth = draft.leaseStartMonth,
                         selectedYear = draft.leaseStartYear,
-                        onYearChange = { viewModel.updateDraft { copy(leaseStartYear = it) } },
+                        onYearChange = {
+                            viewModel.updateDraft { copy(leaseStartYear = it) }
+                        },
                         onMonthSelect = {
                             viewModel.updateDraft {
                                 copy(leaseStartMonth = if (leaseStartMonth == it) null else it)
@@ -179,12 +230,19 @@ fun FilterBottomSheet(
                         }
                     )
                     Spacer(Modifier.height(16.dp))
-                    Text("End", fontSize = 12.sp, color = TextSecondary, fontWeight = FontWeight.Medium)
+                    Text(
+                        "End",
+                        fontSize = 12.sp,
+                        color = TextSecondary,
+                        fontWeight = FontWeight.Medium
+                    )
                     Spacer(Modifier.height(6.dp))
                     MonthYearPicker(
                         selectedMonth = draft.leaseEndMonth,
                         selectedYear = draft.leaseEndYear,
-                        onYearChange = { viewModel.updateDraft { copy(leaseEndYear = it) } },
+                        onYearChange = {
+                            viewModel.updateDraft { copy(leaseEndYear = it) }
+                        },
                         onMonthSelect = {
                             viewModel.updateDraft {
                                 copy(leaseEndMonth = if (leaseEndMonth == it) null else it)
@@ -195,42 +253,107 @@ fun FilterBottomSheet(
 
                 FilterDivider()
 
+                // Building Type (not yet in Listing model - show with warning)
                 FilterSection("Building Type") {
                     listOf("Apartment", "Condo", "House").forEach { type ->
                         Row(
                             Modifier
                                 .fillMaxWidth()
                                 .clip(RoundedCornerShape(8.dp))
-                                .clickable {
-                                    viewModel.updateDraft { copy(buildingTypes = buildingTypes.toggle(type)) }
-                                }
+                                .clickable { viewModel.toggleBuildingType(type) }
                                 .padding(vertical = 2.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Checkbox(
                                 checked = draft.buildingTypes.contains(type),
-                                onCheckedChange = {
-                                    viewModel.updateDraft { copy(buildingTypes = buildingTypes.toggle(type)) }
-                                },
-                                colors = CheckboxDefaults.colors(checkedColor = CribSwapBlue)
+                                onCheckedChange = { viewModel.toggleBuildingType(type) },
+                                colors = CheckboxDefaults.colors(
+                                    checkedColor = CribSwapBlue
+                                )
                             )
                             Text(type, fontSize = 14.sp, color = TextPrimary)
                         }
                     }
+
+                    // Warning badge
+                    Text(
+                        "⚠️ Coming soon - not yet filtering results",
+                        fontSize = 11.sp,
+                        color = TextSecondary,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
                 }
 
                 FilterDivider()
 
+                // Amenities
                 FilterSection("Amenities") {
                     ToggleRow("Furnished", draft.furnished) {
                         viewModel.updateDraft { copy(furnished = it) }
                     }
-                    ToggleRow("In-Unit Laundry", draft.inUnitLaundry) {
-                        viewModel.updateDraft { copy(inUnitLaundry = it) }
+
+                    // In-Unit Laundry (not in model yet)
+                    Row(
+                        Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                        Arrangement.SpaceBetween,
+                        Alignment.CenterVertically
+                    ) {
+                        Column {
+                            Text("In-Unit Laundry", fontSize = 14.sp, color = TextPrimary)
+                            Text(
+                                "Coming soon",
+                                fontSize = 10.sp,
+                                color = TextSecondary
+                            )
+                        }
+                        Switch(
+                            checked = draft.inUnitLaundry,
+                            onCheckedChange = {
+                                viewModel.updateDraft { copy(inUnitLaundry = it) }
+                            },
+                            enabled = false,  // Disabled until backend support
+                            colors = SwitchDefaults.colors(
+                                checkedThumbColor = Color.White,
+                                checkedTrackColor = CribSwapBlue,
+                                uncheckedThumbColor = Color.White,
+                                uncheckedTrackColor = DividerColor,
+                                disabledCheckedThumbColor = Color.White.copy(alpha = 0.5f),
+                                disabledCheckedTrackColor = CribSwapBlue.copy(alpha = 0.3f)
+                            )
+                        )
                     }
-                    ToggleRow("Parking Included", draft.parking) {
-                        viewModel.updateDraft { copy(parking = it) }
+
+                    // Parking (not in model yet)
+                    Row(
+                        Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                        Arrangement.SpaceBetween,
+                        Alignment.CenterVertically
+                    ) {
+                        Column {
+                            Text("Parking Included", fontSize = 14.sp, color = TextPrimary)
+                            Text(
+                                "Coming soon",
+                                fontSize = 10.sp,
+                                color = TextSecondary
+                            )
+                        }
+                        Switch(
+                            checked = draft.parking,
+                            onCheckedChange = {
+                                viewModel.updateDraft { copy(parking = it) }
+                            },
+                            enabled = false,  // Disabled until backend support
+                            colors = SwitchDefaults.colors(
+                                checkedThumbColor = Color.White,
+                                checkedTrackColor = CribSwapBlue,
+                                uncheckedThumbColor = Color.White,
+                                uncheckedTrackColor = DividerColor,
+                                disabledCheckedThumbColor = Color.White.copy(alpha = 0.5f),
+                                disabledCheckedTrackColor = CribSwapBlue.copy(alpha = 0.3f)
+                            )
+                        )
                     }
+
                     ToggleRow("Photos Required", draft.photosRequired) {
                         viewModel.updateDraft { copy(photosRequired = it) }
                     }
@@ -239,6 +362,7 @@ fun FilterBottomSheet(
                 Spacer(Modifier.height(8.dp))
             }
 
+            // ── Footer Buttons ───────────────────────────────────────────────
             HorizontalDivider(color = DividerColor)
             Row(
                 Modifier
@@ -252,8 +376,12 @@ fun FilterBottomSheet(
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(12.dp),
                     border = BorderStroke(1.5.dp, CribSwapBlue),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = CribSwapBlue)
-                ) { Text("Reset", fontWeight = FontWeight.SemiBold) }
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = CribSwapBlue
+                    )
+                ) {
+                    Text("Reset", fontWeight = FontWeight.SemiBold)
+                }
 
                 Button(
                     onClick = {
@@ -262,18 +390,28 @@ fun FilterBottomSheet(
                     },
                     modifier = Modifier.weight(2f),
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = CribSwapBlue)
-                ) { Text("Apply Filters", fontWeight = FontWeight.SemiBold) }
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = CribSwapBlue
+                    )
+                ) {
+                    Text("Apply Filters", fontWeight = FontWeight.SemiBold)
+                }
             }
         }
     }
 }
 
+// ── Reusable Components ──────────────────────────────────────────────────────
 
 @Composable
 private fun FilterSection(title: String, content: @Composable ColumnScope.() -> Unit) {
     Column(Modifier.padding(vertical = 10.dp)) {
-        Text(title, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+        Text(
+            title,
+            fontSize = 15.sp,
+            fontWeight = FontWeight.Bold,
+            color = TextPrimary
+        )
         Spacer(Modifier.height(10.dp))
         content()
     }
@@ -304,12 +442,17 @@ private fun SelectionButtonRow(
                 modifier = Modifier
                     .clip(RoundedCornerShape(10.dp))
                     .background(if (isSelected) CribSwapBlue else CribSwapBlueLight)
-                    .border(1.dp, if (isSelected) CribSwapBlue else Color.Transparent, RoundedCornerShape(10.dp))
+                    .border(
+                        1.dp,
+                        if (isSelected) CribSwapBlue else Color.Transparent,
+                        RoundedCornerShape(10.dp)
+                    )
                     .clickable { onToggle(option) }
                     .padding(horizontal = 12.dp, vertical = 8.dp)
             ) {
                 Text(
-                    option, fontSize = 13.sp,
+                    option,
+                    fontSize = 13.sp,
                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                     color = if (isSelected) Color.White else TextPrimary
                 )
@@ -318,19 +461,22 @@ private fun SelectionButtonRow(
     }
 }
 
-
 @Composable
 private fun ToggleRow(label: String, checked: Boolean, onToggle: (Boolean) -> Unit) {
     Row(
         Modifier.fillMaxWidth().padding(vertical = 4.dp),
-        Arrangement.SpaceBetween, Alignment.CenterVertically
+        Arrangement.SpaceBetween,
+        Alignment.CenterVertically
     ) {
         Text(label, fontSize = 14.sp, color = TextPrimary)
         Switch(
-            checked = checked, onCheckedChange = onToggle,
+            checked = checked,
+            onCheckedChange = onToggle,
             colors = SwitchDefaults.colors(
-                checkedThumbColor = Color.White, checkedTrackColor = CribSwapBlue,
-                uncheckedThumbColor = Color.White, uncheckedTrackColor = DividerColor
+                checkedThumbColor = Color.White,
+                checkedTrackColor = CribSwapBlue,
+                uncheckedThumbColor = Color.White,
+                uncheckedTrackColor = DividerColor
             )
         )
     }

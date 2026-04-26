@@ -33,6 +33,7 @@ fun ListingsScreen(
     val feedState by viewModel.feedState.collectAsState()
     val maxRentFilter by viewModel.maxRentFilter.collectAsState()
     val bedroomsFilter by viewModel.bedroomsFilter.collectAsState()
+    val savedIds by viewModel.savedListingIds.collectAsState()
 
     var showFilterSheet by remember { mutableStateOf(false) }
     var filterValues by remember { mutableStateOf(FilterSheetValues()) }
@@ -93,6 +94,8 @@ fun ListingsScreen(
                             items(state.listings, key = { it.id }) { listing ->
                                 ListingCard(
                                     listing = listing,
+                                    isSaved = listing.id in savedIds,
+                                    onSaveToggle = { viewModel.toggleSaved(listing) },
                                     onClick = {
                                         viewModel.selectListing(listing)
                                         onNavigateToDetail(listing)

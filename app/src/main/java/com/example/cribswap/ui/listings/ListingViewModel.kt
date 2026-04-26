@@ -33,7 +33,7 @@ data class CreateListingFormState(
     val errorMessage: String? = null
 )
 
-// ── Mock Data with real Unsplash apartment photos ─────────────────────────────
+// ── Mock Data ─────────────────────────────────────────────────────────────────
 
 private val MOCK_LISTINGS = mutableListOf(
     Listing(
@@ -199,7 +199,13 @@ class ListingViewModel : ViewModel() {
     private val _formState = MutableStateFlow(CreateListingFormState())
     val formState: StateFlow<CreateListingFormState> = _formState.asStateFlow()
 
+    // ── Saved Listings ────────────────────────────────────────────────────────
+    private val _savedListingIds = MutableStateFlow<Set<String>>(emptySet())
+    val savedListingIds: StateFlow<Set<String>> = _savedListingIds.asStateFlow()
+
     init { loadListings() }
+
+    // ── Feed ──────────────────────────────────────────────────────────────────
 
     fun loadListings() {
         _feedState.value = ListingUiState.Success(MOCK_LISTINGS.toList())
@@ -209,6 +215,25 @@ class ListingViewModel : ViewModel() {
         val myListings = MOCK_LISTINGS.filter { it.userId == "test-user" }
         _feedState.value = ListingUiState.Success(myListings)
     }
+
+    // ── Saved ─────────────────────────────────────────────────────────────────
+
+    fun toggleSaved(listing: Listing) {
+        _savedListingIds.update { current ->
+            if (listing.id in current) current - listing.id
+            else current + listing.id
+        }
+    }
+
+    fun isListingSaved(listingId: String): Boolean {
+        return listingId in _savedListingIds.value
+    }
+
+    fun getSavedListings(): List<Listing> {
+        return MOCK_LISTINGS.filter { it.id in _savedListingIds.value }
+    }
+
+    // ── Filters ───────────────────────────────────────────────────────────────
 
     fun applyFilters(maxRent: Double?, bedrooms: Int?) {
         _maxRentFilter.value = maxRent
@@ -226,16 +251,22 @@ class ListingViewModel : ViewModel() {
         _feedState.value = ListingUiState.Success(MOCK_LISTINGS.toList())
     }
 
+    // ── Detail ────────────────────────────────────────────────────────────────
+
     fun selectListing(listing: Listing) { _selectedListing.value = listing }
     fun clearSelectedListing() { _selectedListing.value = null }
     fun loadListingById(id: String) {
         _selectedListing.value = MOCK_LISTINGS.find { it.id == id }
     }
 
+    // ── Delete ────────────────────────────────────────────────────────────────
+
     fun deactivateListing(listingId: String) {
         MOCK_LISTINGS.removeAll { it.id == listingId }
         loadListings()
     }
+
+    // ── Create form handlers ──────────────────────────────────────────────────
 
     fun onTitleChange(v: String)       { _formState.update { it.copy(title = v) } }
     fun onDescriptionChange(v: String) { _formState.update { it.copy(description = v) } }
@@ -250,6 +281,8 @@ class ListingViewModel : ViewModel() {
     fun onFurnishedToggle()            { _formState.update { it.copy(isFurnished = !it.isFurnished) } }
     fun onPetsToggle()                 { _formState.update { it.copy(petsAllowed = !it.petsAllowed) } }
     fun onUtilitiesToggle()            { _formState.update { it.copy(utilitiesIncluded = !it.utilitiesIncluded) } }
+
+    // ── Submit ────────────────────────────────────────────────────────────────
 
     fun submitListing() {
         val form = _formState.value

@@ -42,17 +42,10 @@ private val PageBackground = Color(0xFFFFFFFF)
 @Composable
 fun ConversationPage(
     modifier: Modifier = Modifier,
-
-    // These are optional values from a listing page.
-    // When the user taps the message icon on a listing,
-    // your teammate can pass the listing owner/seller info here.
     startOtherUserId: String? = null,
     startOtherUserName: String? = null,
     startListingId: String? = null,
-
     onNewChatClick: () -> Unit = {},
-
-    // Sends the selected conversation id and display name to MessagesScreen/ChatPage.
     onConversationClick: (String, String) -> Unit = { _, _ -> }
 ) {
     val db = remember { FirebaseFirestore.getInstance() }
@@ -64,9 +57,9 @@ fun ConversationPage(
         if (startOtherUserId != null) {
             val conversationId = conversationRepository.getOrCreateConversation(
                 otherUserId = startOtherUserId,
-                listingId = startListingId
+                listingId = startListingId,
+                otherUserName = startOtherUserName
             )
-
             onConversationClick(
                 conversationId,
                 startOtherUserName ?: startOtherUserId
@@ -97,7 +90,6 @@ fun ConversationPage(
                     fontWeight = FontWeight.Bold,
                     color = Color.Black
                 )
-
                 Text(
                     text = "${conversations.size} conversations",
                     fontSize = 14.sp,
@@ -119,17 +111,16 @@ fun ConversationPage(
             }
         }
 
-        LazyColumn(
-            modifier = Modifier.fillMaxSize()
-        ) {
+        LazyColumn(modifier = Modifier.fillMaxSize()) {
             items(conversations) { conversation ->
                 val myUid = auth.currentUser?.uid ?: "test-buyer-1"
+                val otherUserId = conversation.participants.firstOrNull { it != myUid } ?: "Unknown"
 
-                val otherUserId =
-                    conversation.participants.firstOrNull { it != myUid } ?: "Unknown User"
+                // Use stored name if available, otherwise fall back to userId
+                val displayName = conversation.otherUserName ?: otherUserId
 
                 val preview = ConversationPreview(
-                    name = otherUserId,
+                    name = displayName,
                     lastMessage = conversation.lastMessage ?: "",
                     time = formatConversationTime(conversation.lastMessageAt?.toDate()?.time),
                     unreadCount = 0
@@ -138,7 +129,7 @@ fun ConversationPage(
                 ConversationRow(
                     convo = preview,
                     onClick = {
-                        onConversationClick(conversation.id, otherUserId)
+                        onConversationClick(conversation.id, displayName)
                     }
                 )
             }
@@ -148,7 +139,6 @@ fun ConversationPage(
 
 private fun formatConversationTime(timestamp: Long?): String {
     if (timestamp == null) return ""
-
     val formatter = SimpleDateFormat("h:mm a", Locale.getDefault())
     return formatter.format(timestamp)
 }

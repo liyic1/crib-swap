@@ -4,6 +4,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.*
@@ -11,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -18,14 +21,12 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.cribswap.data.model.Listing
 
-/**
- * Reusable listing preview card used in the feed, saved listings,
- * and search results screens.
- */
 @Composable
 fun ListingCard(
     listing: Listing,
     onClick: () -> Unit,
+    isSaved: Boolean = false,
+    onSaveToggle: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -37,36 +38,52 @@ fun ListingCard(
     ) {
         Column {
             // ── Photo ─────────────────────────────────────────────────────────
-            if (listing.photoUrls.isNotEmpty()) {
-                AsyncImage(
-                    model = listing.photoUrls.first(),
-                    contentDescription = "Listing photo",
-                    contentScale = ContentScale.Crop,
+            Box {
+                if (listing.photoUrls.isNotEmpty()) {
+                    AsyncImage(
+                        model = listing.photoUrls.first(),
+                        contentDescription = "Listing photo",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(180.dp)
+                            .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
+                    )
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(140.dp)
+                            .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            Icons.Default.Home,
+                            contentDescription = null,
+                            modifier = Modifier.size(48.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.35f)
+                        )
+                    }
+                }
+
+                // ── Heart button overlay ──────────────────────────────────────
+                IconButton(
+                    onClick = onSaveToggle,
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(180.dp)
-                        .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
-                )
-            } else {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(140.dp)
-                        .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)),
-                    contentAlignment = Alignment.Center
+                        .align(Alignment.TopEnd)
+                        .padding(4.dp)
                 ) {
                     Icon(
-                        Icons.Default.Home,
-                        contentDescription = null,
-                        modifier = Modifier.size(48.dp),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.35f)
+                        imageVector = if (isSaved) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                        contentDescription = if (isSaved) "Unsave listing" else "Save listing",
+                        tint = if (isSaved) Color.Red else Color.White,
+                        modifier = Modifier.size(28.dp)
                     )
                 }
             }
 
             // ── Body ──────────────────────────────────────────────────────────
             Column(modifier = Modifier.padding(12.dp)) {
-
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -107,13 +124,12 @@ fun ListingCard(
 
                 Spacer(Modifier.height(8.dp))
 
-                // ── Chips ─────────────────────────────────────────────────────
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     ListingChip("${listing.bedrooms} bd")
                     ListingChip("${listing.bathrooms} ba")
-                    if (listing.isFurnished)      ListingChip("Furnished")
-                    if (listing.petsAllowed)       ListingChip("Pets OK")
-                    if (listing.utilitiesIncluded) ListingChip("Utilities ✓")
+                    if (listing.isFurnished)       ListingChip("Furnished")
+                    if (listing.petsAllowed)        ListingChip("Pets OK")
+                    if (listing.utilitiesIncluded)  ListingChip("Utilities ✓")
                 }
             }
         }

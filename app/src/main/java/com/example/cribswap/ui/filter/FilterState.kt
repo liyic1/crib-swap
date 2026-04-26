@@ -4,7 +4,6 @@ import com.google.firebase.Timestamp
 import java.util.Calendar
 
 data class FilterState(
-    // match listings data model
     val priceMin: Float = 0f,
     val priceMax: Float = 3000f,
     val locationQuery: String = "",
@@ -73,7 +72,7 @@ data class FilterState(
 object BedroomMapper {
     fun stringToInt(bedroom: String): Int = when (bedroom) {
         "Studio" -> 0
-        "4+" -> 5  // Store 4+ as 5 to allow whereIn queries
+        "4+" -> 5
         else -> bedroom.toIntOrNull() ?: 1
     }
 

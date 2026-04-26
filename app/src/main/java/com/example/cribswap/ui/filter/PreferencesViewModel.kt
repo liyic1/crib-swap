@@ -46,7 +46,6 @@ class PreferencesViewModel(
             leaseEndYear    = p.leaseEndYear
         )
 
-        // Apply to filter system
         filterViewModel.applyPreferences(initialState)
 
         _onboardingComplete.value = true

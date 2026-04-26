@@ -20,10 +20,8 @@ class SubleaseRepository(
         userLongitude: Double? = null
     ): Flow<Result<List<Listing>>> = callbackFlow {
         try {
-            // Build Firestore query
             val query = buildFirestoreQuery(filters)
 
-            // Listen to real-time updates
             val listener = query.addSnapshotListener { snapshot, error ->
                 if (error != null) {
                     trySend(Result.failure(error))
@@ -34,7 +32,6 @@ class SubleaseRepository(
                     ?.mapNotNull { it.toObject(Listing::class.java) }
                     ?: emptyList()
 
-                // Apply client-side filters
                 val fullyFilteredListings = applyClientSideFilters(
                     listings = serverFilteredListings,
                     filters = filters,
@@ -148,9 +145,7 @@ class SubleaseRepository(
         val desiredStart = filters.getLeaseStartTimestamp()
         val desiredEnd = filters.getLeaseEndTimestamp()
 
-        // If user wants to start on a specific date, listing must be available then
         if (desiredStart != null) {
-            // Listing should start on or before desired start, and end after it
             if (listingStart.toDate().after(desiredStart.toDate())) {
                 return false
             }
@@ -159,9 +154,8 @@ class SubleaseRepository(
             }
         }
 
-        // If user wants to end on a specific date, listing must cover that period
         if (desiredEnd != null) {
-            // Listing should start before desired end, and end on or after it
+
             if (listingStart.toDate().after(desiredEnd.toDate())) {
                 return false
             }

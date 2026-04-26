@@ -25,7 +25,6 @@ class FilterViewModel : ViewModel() {
     private val _applied = MutableStateFlow(defaultState)
     val applied: StateFlow<FilterState> = _applied.asStateFlow()
 
-    // 🔥 MODIFIED: Use mock data for now (swap with repository later)
     val filteredListings: StateFlow<Result<List<Listing>>> = _applied
         .map { filters ->
             try {
@@ -41,7 +40,6 @@ class FilterViewModel : ViewModel() {
             initialValue = Result.success(MockListingData.MOCK_LISTINGS)
         )
 
-    // 🔥 TEMPORARY: Mock filtering logic (replace with repository when ready)
     private fun applyMockFilters(listings: List<Listing>, filters: FilterState): List<Listing> {
         return listings.filter { listing ->
             // Price range
@@ -81,7 +79,7 @@ class FilterViewModel : ViewModel() {
 
     fun resetFilters() {
         _draft.value = defaultState
-        _applied.value = defaultState  // 🔥 Also reset applied filters
+        _applied.value = defaultState
     }
 
     fun applyPreferences(state: FilterState) {

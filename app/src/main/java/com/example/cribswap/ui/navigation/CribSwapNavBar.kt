@@ -6,7 +6,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -24,8 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import com.example.cribswap.ui.Chat
-import com.example.cribswap.ui.Home
 import com.example.cribswap.ui.Saved
 import com.example.cribswap.ui.conversation.MessagesScreen
 import com.example.cribswap.ui.filter.FilterViewModel
@@ -38,10 +35,10 @@ import com.example.cribswap.ui.theme.NavBarContentSelected
 import com.example.cribswap.ui.theme.NavBarContentUnselected
 import com.example.cribswap.ui.theme.NavBarIndicator
 
+
 private val navItemList = listOf(
-    NavItem("Home", Icons.Default.Home),
-    NavItem("Saved", Icons.Default.Favorite),
     NavItem("Listings", Icons.Default.List),
+    NavItem("Saved", Icons.Default.Favorite),
     NavItem("Chat", Icons.Default.Create),
     NavItem("Profile", Icons.Default.Face)
 )
@@ -65,7 +62,7 @@ fun CribSwapNavBar(
                         selected = selectedIndex == index,
                         onClick = {
                             selectedIndex = index
-                            if (index == 4) profileSubScreen = ProfileSubScreen.Profile.name
+                            if (index == 3) profileSubScreen = ProfileSubScreen.Profile.name
                         },
                         icon = { Icon(imageVector = navItem.icon, contentDescription = navItem.label) },
                         label = { Text(text = navItem.label) },
@@ -84,15 +81,7 @@ fun CribSwapNavBar(
         val listingsViewModel: ListingViewModel = viewModel()
 
         when (selectedIndex) {
-            0 -> Home(
-                modifier = Modifier.padding(innerPadding),
-                filterViewModel = filterViewModel
-            )
-            1 -> Saved(
-                modifier = Modifier.padding(innerPadding),
-                listingViewModel = listingsViewModel
-            )
-            2 -> {
+            0 -> {
                 val listingsNavController = rememberNavController()
                 NavHost(
                     navController = listingsNavController,
@@ -104,19 +93,23 @@ fun CribSwapNavBar(
                         onNavigateToChat = { userId, userName ->
                             pendingMessageUserId = userId
                             pendingMessageUserName = userName
-                            selectedIndex = 3
+                            selectedIndex = 2
                         },
                         sharedViewModel = listingsViewModel,
                         filterViewModel = filterViewModel
                     )
                 }
             }
-            3 -> MessagesScreen(
+            1 -> Saved(
+                modifier = Modifier.padding(innerPadding),
+                listingViewModel = listingsViewModel
+            )
+            2 -> MessagesScreen(
                 modifier = Modifier.padding(innerPadding),
                 startWithUserId = pendingMessageUserId.ifBlank { null },
                 startWithUserName = pendingMessageUserName.ifBlank { null }
             )
-            4 -> when (profileSubScreen) {
+            3 -> when (profileSubScreen) {
                 ProfileSubScreen.Profile.name -> ProfileScreen(
                     onNavigateToSettings = { profileSubScreen = ProfileSubScreen.Settings.name },
                     onNavigateToPersonalDetail = { profileSubScreen = ProfileSubScreen.PersonalDetail.name }
@@ -128,10 +121,6 @@ fun CribSwapNavBar(
                     onBack = { profileSubScreen = ProfileSubScreen.Profile.name }
                 )
             }
-            else -> Home(
-                modifier = Modifier.padding(innerPadding),
-                filterViewModel = filterViewModel
-            )
         }
     }
 }

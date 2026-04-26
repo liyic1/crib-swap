@@ -11,24 +11,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.cribswap.navigation.CribSwapAppRouter
 import com.example.cribswap.navigation.Screen
+import com.example.cribswap.ui.conversation.MessagesScreen
 import com.example.cribswap.ui.filter.FilterViewModel
 import com.example.cribswap.ui.filter.PreferencesScreen
 import com.example.cribswap.ui.filter.PreferencesViewModel
 import com.example.cribswap.ui.navigation.CribSwapNavBar
-import com.example.cribswap.ui.screen.AboutUsScreen
-import com.example.cribswap.ui.screen.ChangePasswordScreen
-import com.example.cribswap.ui.screen.EditProfileScreen
-import com.example.cribswap.ui.screen.EmailVerificationScreen
-import com.example.cribswap.ui.screen.ForgotPasswordScreen
-import com.example.cribswap.ui.screen.HomeScreen
-import com.example.cribswap.ui.screen.LoginScreen
-import com.example.cribswap.ui.screen.NotificationsScreen
-import com.example.cribswap.ui.screen.PersonalDetailScreen
-import com.example.cribswap.ui.screen.PrivacyPolicyScreen
-import com.example.cribswap.ui.screen.ProfileScreen
-import com.example.cribswap.ui.screen.SettingsScreen
-import com.example.cribswap.ui.screen.SignUpScreen
-import com.example.cribswap.ui.screen.TermsScreen
+import com.example.cribswap.ui.screen.*
 
 @Composable
 fun CribSwapApp() {
@@ -40,10 +28,11 @@ fun CribSwapApp() {
             when (currentState.value) {
 
                 is Screen.LoginScreen -> LoginScreen()
-
                 is Screen.SignUpScreen -> SignUpScreen()
-
                 is Screen.ForgotPasswordScreen -> ForgotPasswordScreen()
+
+                // Temporary messaging test screen.
+                is Screen.MessagesScreen -> MessagesScreen()
 
                 is Screen.ProfileScreen -> ProfileScreen(
                     onNavigateToSettings = {

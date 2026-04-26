@@ -1,6 +1,7 @@
 package com.example.cribswap.ui.filter
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.cribswap.data.model.Listing
 import com.example.cribswap.data.repo.SubleaseRepository
@@ -100,3 +101,15 @@ class FilterViewModel(
 
 private fun <T> List<T>.toggle(item: T): List<T> =
     if (contains(item)) this - item else this + item
+
+class PreferencesViewModelFactory(
+    private val filterViewModel: FilterViewModel
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(PreferencesViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return PreferencesViewModel(filterViewModel) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}

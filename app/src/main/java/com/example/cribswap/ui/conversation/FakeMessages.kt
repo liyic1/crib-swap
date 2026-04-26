@@ -1,37 +1,47 @@
 package com.example.cribswap.ui.conversation
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
+/**
+ * One message inside a chat thread.
+ */
+data class ChatMessage(
+    val id: Int,
+    val text: String,
+    val time: String,
+    val isFromMe: Boolean
+)
 
-@Composable
-fun MessagesScreen(
-    modifier: Modifier = Modifier
-) {
-    var selectedConversationId by remember { mutableStateOf<String?>(null) }
-    var selectedUserName by remember { mutableStateOf("") }
-
-    if (selectedConversationId == null) {
-        ConversationPage(
-            modifier = modifier,
-            onConversationClick = { conversationId, userName ->
-                selectedConversationId = conversationId
-                selectedUserName = userName
-            }
-        )
-    } else {
-        ChatPage(
-            modifier = modifier,
-            conversationId = selectedConversationId!!,
-            userName = selectedUserName,
-            userStatus = "Usually replies quickly",
-            onBackClick = {
-                selectedConversationId = null
-                selectedUserName = ""
-            }
-        )
-    }
-}
+/**
+ * Fake chat messages for UI testing.
+ */
+val fakeMessages = listOf(
+    ChatMessage(
+        id = 1,
+        text = "blablabla",
+        time = "10:36",
+        isFromMe = true
+    ),
+    ChatMessage(
+        id = 2,
+        text = "blablablalllaaaa.",
+        time = "11:22",
+        isFromMe = false
+    ),
+    ChatMessage(
+        id = 3,
+        text = "blabalbal",
+        time = "11:24",
+        isFromMe = true
+    ),
+    ChatMessage(
+        id = 4,
+        text = "blablabla.",
+        time = "11:26",
+        isFromMe = false
+    ),
+    ChatMessage(
+        id = 5,
+        text = "balblabal",
+        time = "11:28",
+        isFromMe = true
+    )
+)

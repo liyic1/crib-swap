@@ -80,21 +80,20 @@ fun CribSwapApp() {
                     onBack = { CribSwapAppRouter.navigateTo(Screen.SettingsScreen) }
                 )
 
-                is Screen.MainScreen -> {
+                is Screen.PreferencesScreen -> {
                     val filterViewModel: FilterViewModel = viewModel()
                     val preferencesViewModel: PreferencesViewModel = viewModel(
                         factory = PreferencesViewModelFactory(filterViewModel)
                     )
-                    val onboardingComplete by preferencesViewModel.onboardingComplete
-                        .collectAsStateWithLifecycle()
 
-                    if (onboardingComplete) {
-                        CribSwapNavBar(filterViewModel = filterViewModel)
-                    } else {
-                        PreferencesScreen(
-                            preferencesViewModel = preferencesViewModel
-                        )
-                    }
+                    PreferencesScreen(
+                        preferencesViewModel = preferencesViewModel
+                    )
+                }
+
+                is Screen.MainScreen -> {
+                    val filterViewModel: FilterViewModel = viewModel()
+                    CribSwapNavBar(filterViewModel = filterViewModel)
                 }
             }
         }

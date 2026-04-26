@@ -181,33 +181,6 @@ fun FilterBottomSheet(
 
                 FilterDivider()
 
-                // Roommates (not yet in Listing model - show with warning)
-                FilterSection("Roommates") {
-                    val roommateOptions = listOf("0", "1", "2", "3", "4+")
-                    val selectedRoommates = draft.roommates.map {
-                        when (it) {
-                            5 -> "4+"
-                            else -> it.toString()
-                        }
-                    }
-
-                    SelectionButtonRow(
-                        options = roommateOptions,
-                        selected = selectedRoommates,
-                        onToggle = { viewModel.toggleRoommate(it) }
-                    )
-
-                    // Warning badge
-                    Text(
-                        "⚠️ Coming soon - not yet filtering results",
-                        fontSize = 11.sp,
-                        color = TextSecondary,
-                        modifier = Modifier.padding(top = 4.dp)
-                    )
-                }
-
-                FilterDivider()
-
                 // Lease Term
                 FilterSection("Lease Term") {
                     Text(
@@ -253,105 +226,10 @@ fun FilterBottomSheet(
 
                 FilterDivider()
 
-                // Building Type (not yet in Listing model - show with warning)
-                FilterSection("Building Type") {
-                    listOf("Apartment", "Condo", "House").forEach { type ->
-                        Row(
-                            Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(8.dp))
-                                .clickable { viewModel.toggleBuildingType(type) }
-                                .padding(vertical = 2.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Checkbox(
-                                checked = draft.buildingTypes.contains(type),
-                                onCheckedChange = { viewModel.toggleBuildingType(type) },
-                                colors = CheckboxDefaults.colors(
-                                    checkedColor = CribSwapBlue
-                                )
-                            )
-                            Text(type, fontSize = 14.sp, color = TextPrimary)
-                        }
-                    }
-
-                    // Warning badge
-                    Text(
-                        "⚠️ Coming soon - not yet filtering results",
-                        fontSize = 11.sp,
-                        color = TextSecondary,
-                        modifier = Modifier.padding(top = 4.dp)
-                    )
-                }
-
-                FilterDivider()
-
                 // Amenities
                 FilterSection("Amenities") {
                     ToggleRow("Furnished", draft.furnished) {
                         viewModel.updateDraft { copy(furnished = it) }
-                    }
-
-                    // In-Unit Laundry (not in model yet)
-                    Row(
-                        Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                        Arrangement.SpaceBetween,
-                        Alignment.CenterVertically
-                    ) {
-                        Column {
-                            Text("In-Unit Laundry", fontSize = 14.sp, color = TextPrimary)
-                            Text(
-                                "Coming soon",
-                                fontSize = 10.sp,
-                                color = TextSecondary
-                            )
-                        }
-                        Switch(
-                            checked = draft.inUnitLaundry,
-                            onCheckedChange = {
-                                viewModel.updateDraft { copy(inUnitLaundry = it) }
-                            },
-                            enabled = false,  // Disabled until backend support
-                            colors = SwitchDefaults.colors(
-                                checkedThumbColor = Color.White,
-                                checkedTrackColor = CribSwapBlue,
-                                uncheckedThumbColor = Color.White,
-                                uncheckedTrackColor = DividerColor,
-                                disabledCheckedThumbColor = Color.White.copy(alpha = 0.5f),
-                                disabledCheckedTrackColor = CribSwapBlue.copy(alpha = 0.3f)
-                            )
-                        )
-                    }
-
-                    // Parking (not in model yet)
-                    Row(
-                        Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                        Arrangement.SpaceBetween,
-                        Alignment.CenterVertically
-                    ) {
-                        Column {
-                            Text("Parking Included", fontSize = 14.sp, color = TextPrimary)
-                            Text(
-                                "Coming soon",
-                                fontSize = 10.sp,
-                                color = TextSecondary
-                            )
-                        }
-                        Switch(
-                            checked = draft.parking,
-                            onCheckedChange = {
-                                viewModel.updateDraft { copy(parking = it) }
-                            },
-                            enabled = false,  // Disabled until backend support
-                            colors = SwitchDefaults.colors(
-                                checkedThumbColor = Color.White,
-                                checkedTrackColor = CribSwapBlue,
-                                uncheckedThumbColor = Color.White,
-                                uncheckedTrackColor = DividerColor,
-                                disabledCheckedThumbColor = Color.White.copy(alpha = 0.5f),
-                                disabledCheckedTrackColor = CribSwapBlue.copy(alpha = 0.3f)
-                            )
-                        )
                     }
 
                     ToggleRow("Photos Required", draft.photosRequired) {

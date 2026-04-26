@@ -15,6 +15,7 @@ import com.example.cribswap.ui.conversation.MessagesScreen
 import com.example.cribswap.ui.filter.FilterViewModel
 import com.example.cribswap.ui.filter.PreferencesScreen
 import com.example.cribswap.ui.filter.PreferencesViewModel
+import com.example.cribswap.ui.filter.PreferencesViewModelFactory
 import com.example.cribswap.ui.navigation.CribSwapNavBar
 import com.example.cribswap.ui.screen.*
 
@@ -79,19 +80,20 @@ fun CribSwapApp() {
                     onBack = { CribSwapAppRouter.navigateTo(Screen.SettingsScreen) }
                 )
 
+                is Screen.PreferencesScreen -> {
+                    val filterViewModel: FilterViewModel = viewModel()
+                    val preferencesViewModel: PreferencesViewModel = viewModel(
+                        factory = PreferencesViewModelFactory(filterViewModel)
+                    )
+
+                    PreferencesScreen(
+                        preferencesViewModel = preferencesViewModel
+                    )
+                }
+
                 is Screen.MainScreen -> {
                     val filterViewModel: FilterViewModel = viewModel()
-                    val preferencesViewModel: PreferencesViewModel = viewModel()
-                    val onboardingComplete by preferencesViewModel.onboardingComplete
-                        .collectAsStateWithLifecycle()
-
-                    if (onboardingComplete) {
-                        CribSwapNavBar(filterViewModel = filterViewModel)
-                    } else {
-                        PreferencesScreen(
-                            preferencesViewModel = preferencesViewModel
-                        )
-                    }
+                    CribSwapNavBar(filterViewModel = filterViewModel)
                 }
             }
         }

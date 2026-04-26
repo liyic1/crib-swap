@@ -3,23 +3,12 @@ package com.example.cribswap.ui.filter
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cribswap.data.model.Listing
-import com.example.cribswap.data.repo.SubleaseRepository
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.Timestamp
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import java.util.Calendar
+import com.example.cribswap.data.MockListingData
 
-class FilterViewModel(
-    private val repository: SubleaseRepository,
-    private val userLatitude: Double? = null,
-    private val userLongitude: Double? = null
-) : ViewModel() {
-
-    constructor() : this(
-        repository = SubleaseRepository(FirebaseFirestore.getInstance()),
-        userLatitude = null,
-        userLongitude = null
-    )
+class FilterViewModel : ViewModel() {
 
     private val currentYear: Int
         get() = Calendar.getInstance().get(Calendar.YEAR)
@@ -36,19 +25,51 @@ class FilterViewModel(
     private val _applied = MutableStateFlow(defaultState)
     val applied: StateFlow<FilterState> = _applied.asStateFlow()
 
+    // 🔥 MODIFIED: Use mock data for now (swap with repository later)
     val filteredListings: StateFlow<Result<List<Listing>>> = _applied
-        .flatMapLatest { filters ->
-            repository.getFilteredListings(
-                filters = filters,
-                userLatitude = userLatitude,
-                userLongitude = userLongitude
-            )
+        .map { filters ->
+            try {
+                val filtered = applyMockFilters(MockListingData.MOCK_LISTINGS, filters)
+                Result.success(filtered)
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
         }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = Result.success(emptyList())
+            initialValue = Result.success(MockListingData.MOCK_LISTINGS)
         )
+
+    // 🔥 TEMPORARY: Mock filtering logic (replace with repository when ready)
+    private fun applyMockFilters(listings: List<Listing>, filters: FilterState): List<Listing> {
+        return listings.filter { listing ->
+            // Price range
+            val matchesPrice = listing.rent >= filters.priceMin && listing.rent <= filters.priceMax
+
+            // Bedrooms
+            val matchesBedrooms = if (filters.bedrooms.isNotEmpty()) {
+                filters.bedrooms.contains(listing.bedrooms)
+            } else true
+
+            // Bathrooms
+            val matchesBathrooms = if (filters.bathrooms.isNotEmpty()) {
+                filters.bathrooms.contains(listing.bathrooms)
+            } else true
+
+            // Furnished
+            val matchesFurnished = if (filters.furnished) {
+                listing.isFurnished
+            } else true
+
+            // Photos required
+            val matchesPhotos = if (filters.photosRequired) {
+                listing.photoUrls.isNotEmpty()
+            } else true
+
+            matchesPrice && matchesBedrooms && matchesBathrooms && matchesFurnished && matchesPhotos
+        }
+    }
 
     fun updateDraft(update: FilterState.() -> FilterState) {
         _draft.value = _draft.value.update()
@@ -60,6 +81,7 @@ class FilterViewModel(
 
     fun resetFilters() {
         _draft.value = defaultState
+        _applied.value = defaultState  // 🔥 Also reset applied filters
     }
 
     fun applyPreferences(state: FilterState) {
@@ -81,21 +103,6 @@ class FilterViewModel(
         }
     }
 
-    fun toggleRoommate(roommateString: String) {
-        val roommateInt = when (roommateString) {
-            "4+" -> 5
-            else -> roommateString.toIntOrNull() ?: 0
-        }
-        updateDraft {
-            copy(roommates = roommates.toggle(roommateInt))
-        }
-    }
-
-    fun toggleBuildingType(type: String) {
-        updateDraft {
-            copy(buildingTypes = buildingTypes.toggle(type))
-        }
-    }
 }
 
 private fun <T> List<T>.toggle(item: T): List<T> =

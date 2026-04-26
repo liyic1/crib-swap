@@ -20,6 +20,8 @@ sealed class Screen {
     object TermsScreen : Screen()
     object MainScreen : Screen() // post-login: nav bar and filter
     object MessagesScreen : Screen()
+
+    object PreferencesScreen : Screen()
 }
 
 object CribSwapAppRouter {

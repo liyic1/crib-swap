@@ -3,6 +3,7 @@ package com.example.cribswap.ui.navigation
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
+import com.example.cribswap.ui.filter.FilterViewModel
 import com.example.cribswap.ui.listings.*
 
 object ListingRoutes {
@@ -15,11 +16,13 @@ object ListingRoutes {
 fun NavGraphBuilder.listingsNavGraph(
     navController: NavHostController,
     onNavigateToChat: (String, String) -> Unit = { _, _ -> },
-    sharedViewModel: ListingViewModel
+    sharedViewModel: ListingViewModel,
+    filterViewModel: FilterViewModel  // 🔥 NEW: Accept FilterViewModel
 ) {
     composable(ListingRoutes.FEED) {
         ListingsScreen(
             viewModel = sharedViewModel,
+            filterViewModel = filterViewModel,  // 🔥 NEW: Pass to screen
             onNavigateToDetail = { listing ->
                 sharedViewModel.selectListing(listing)
                 navController.navigate(ListingRoutes.DETAIL)

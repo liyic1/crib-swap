@@ -106,7 +106,8 @@ fun CribSwapNavBar(
                             pendingMessageUserName = userName
                             selectedIndex = 3
                         },
-                        sharedViewModel = listingsViewModel
+                        sharedViewModel = listingsViewModel,
+                        filterViewModel = filterViewModel
                     )
                 }
             }

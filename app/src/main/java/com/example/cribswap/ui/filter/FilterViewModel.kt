@@ -103,21 +103,6 @@ class FilterViewModel : ViewModel() {
         }
     }
 
-    fun toggleRoommate(roommateString: String) {
-        val roommateInt = when (roommateString) {
-            "4+" -> 5
-            else -> roommateString.toIntOrNull() ?: 0
-        }
-        updateDraft {
-            copy(roommates = roommates.toggle(roommateInt))
-        }
-    }
-
-    fun toggleBuildingType(type: String) {
-        updateDraft {
-            copy(buildingTypes = buildingTypes.toggle(type))
-        }
-    }
 }
 
 private fun <T> List<T>.toggle(item: T): List<T> =

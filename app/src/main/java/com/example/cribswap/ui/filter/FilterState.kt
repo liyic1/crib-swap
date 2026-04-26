@@ -23,11 +23,6 @@ data class FilterState(
     val furnished: Boolean = false,
     val photosRequired: Boolean = false,
 
-    // not in listing model yet so maybe just delete later
-    val inUnitLaundry: Boolean = false,      // TODO: Add to Listing model
-    val parking: Boolean = false,            // TODO: Add to Listing model
-    val roommates: List<Int> = emptyList(),  // TODO: Add to Listing model
-    val buildingTypes: List<String> = emptyList()  // TODO: Add to Listing model
 ) {
 
     fun getLeaseStartTimestamp(): Timestamp? {

@@ -116,28 +116,6 @@ fun PreferencesScreen(
                     ),
                     modifier = Modifier.fillMaxWidth()
                 )
-                Spacer(Modifier.height(12.dp))
-                Text(
-                    "Within ${prefs.distanceMiles.toInt()} mile${if (prefs.distanceMiles > 1f) "s" else ""}",
-                    fontSize = 14.sp, color = CribSwapBlue, fontWeight = FontWeight.SemiBold
-                )
-                Spacer(Modifier.height(8.dp))
-                Slider(
-                    value = prefs.distanceMiles,
-                    onValueChange = {
-                        preferencesViewModel.updatePrefs { copy(distanceMiles = it) }
-                    },
-                    valueRange = 1f..50f, steps = 48,
-                    colors = SliderDefaults.colors(
-                        thumbColor = CribSwapBlue,
-                        activeTrackColor = CribSwapBlue,
-                        inactiveTrackColor = DividerColor
-                    )
-                )
-                Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween) {
-                    Text("1 mile", fontSize = 11.sp, color = TextSecondary)
-                    Text("50+ miles", fontSize = 11.sp, color = TextSecondary)
-                }
             }
 
             HorizontalDivider(color = DividerColor)

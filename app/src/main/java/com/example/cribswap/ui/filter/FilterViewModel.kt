@@ -42,33 +42,34 @@ class FilterViewModel : ViewModel() {
 
     private fun applyMockFilters(listings: List<Listing>, filters: FilterState): List<Listing> {
         return listings.filter { listing ->
-            // Price range
             val matchesPrice = listing.rent >= filters.priceMin && listing.rent <= filters.priceMax
 
-            // Bedrooms
             val matchesBedrooms = if (filters.bedrooms.isNotEmpty()) {
                 filters.bedrooms.contains(listing.bedrooms)
             } else true
 
-            // Bathrooms
             val matchesBathrooms = if (filters.bathrooms.isNotEmpty()) {
                 filters.bathrooms.contains(listing.bathrooms)
             } else true
 
-            // Furnished
             val matchesFurnished = if (filters.furnished) {
                 listing.isFurnished
             } else true
 
-            // Photos required
             val matchesPhotos = if (filters.photosRequired) {
                 listing.photoUrls.isNotEmpty()
             } else true
 
-            matchesPrice && matchesBedrooms && matchesBathrooms && matchesFurnished && matchesPhotos
+            val matchesLocation = if (filters.locationQuery.isNotBlank()) {
+                listing.city.contains(filters.locationQuery, ignoreCase = true) ||
+                        listing.zipCode.contains(filters.locationQuery, ignoreCase = true) ||
+                        listing.address.contains(filters.locationQuery, ignoreCase = true)
+            } else true
+
+            matchesPrice && matchesBedrooms && matchesBathrooms &&
+                    matchesFurnished && matchesPhotos && matchesLocation
         }
     }
-
     fun updateDraft(update: FilterState.() -> FilterState) {
         _draft.value = _draft.value.update()
     }

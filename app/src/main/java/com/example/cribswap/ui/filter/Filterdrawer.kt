@@ -122,29 +122,6 @@ fun FilterBottomSheet(
                         ),
                         modifier = Modifier.fillMaxWidth()
                     )
-                    Spacer(Modifier.height(10.dp))
-                    Box(Modifier.fillMaxWidth().height(22.dp)) {
-                        Text(
-                            "Within ${draft.distanceMiles.toInt()} mile${if (draft.distanceMiles > 1f) "s" else ""}",
-                            fontSize = 13.sp,
-                            color = CribSwapBlue,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    }
-                    Slider(
-                        value = draft.distanceMiles,
-                        onValueChange = {
-                            viewModel.updateDraft { copy(distanceMiles = it) }
-                        },
-                        valueRange = 1f..50f,
-                        steps = 48,
-                        colors = SliderDefaults.colors(
-                            thumbColor = CribSwapBlue,
-                            activeTrackColor = CribSwapBlue,
-                            inactiveTrackColor = DividerColor
-                        )
-                    )
-                    MinMaxLabel("1 mile", "50+ miles")
                 }
 
                 FilterDivider()

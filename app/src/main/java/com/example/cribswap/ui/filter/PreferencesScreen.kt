@@ -30,7 +30,8 @@ import com.example.cribswap.ui.theme.TextSecondary
 
 @Composable
 fun PreferencesScreen(
-    preferencesViewModel: PreferencesViewModel = viewModel()
+    preferencesViewModel: PreferencesViewModel = viewModel(),
+    onComplete: () -> Unit = {}
 ) {
     val prefs by preferencesViewModel.prefs.collectAsState()
 
@@ -187,7 +188,10 @@ fun PreferencesScreen(
                 .navigationBarsPadding()
         ) {
             Button(
-                onClick = { preferencesViewModel.completeOnboarding() },
+                onClick = {
+                    preferencesViewModel.completeOnboarding()
+                    onComplete()
+                },
                 modifier = Modifier.fillMaxWidth().height(52.dp),
                 shape = RoundedCornerShape(14.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = CribSwapBlue)

@@ -87,7 +87,10 @@ fun CribSwapApp() {
                     )
 
                     PreferencesScreen(
-                        preferencesViewModel = preferencesViewModel
+                        preferencesViewModel = preferencesViewModel,
+                        onComplete = {
+                            CribSwapAppRouter.navigateTo(Screen.MainScreen)
+                        }
                     )
                 }
 

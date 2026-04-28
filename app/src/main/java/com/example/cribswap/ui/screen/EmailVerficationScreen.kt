@@ -76,7 +76,7 @@ fun EmailVerificationScreen() {
         if (isVerified) {
             message = "Email verified successfully."
             delay(1000)
-            CribSwapAppRouter.navigateTo(Screen.MainScreen)
+            CribSwapAppRouter.navigateTo(Screen.PreferencesScreen)
         }
     }
 

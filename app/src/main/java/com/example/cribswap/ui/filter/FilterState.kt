@@ -4,7 +4,6 @@ import com.google.firebase.Timestamp
 import java.util.Calendar
 
 data class FilterState(
-    // match listings data model
     val priceMin: Float = 0f,
     val priceMax: Float = 3000f,
     val locationQuery: String = "",
@@ -23,11 +22,6 @@ data class FilterState(
     val furnished: Boolean = false,
     val photosRequired: Boolean = false,
 
-    // not in listing model yet so maybe just delete later
-    val inUnitLaundry: Boolean = false,      // TODO: Add to Listing model
-    val parking: Boolean = false,            // TODO: Add to Listing model
-    val roommates: List<Int> = emptyList(),  // TODO: Add to Listing model
-    val buildingTypes: List<String> = emptyList()  // TODO: Add to Listing model
 ) {
 
     fun getLeaseStartTimestamp(): Timestamp? {
@@ -78,7 +72,7 @@ data class FilterState(
 object BedroomMapper {
     fun stringToInt(bedroom: String): Int = when (bedroom) {
         "Studio" -> 0
-        "4+" -> 5  // Store 4+ as 5 to allow whereIn queries
+        "4+" -> 5
         else -> bedroom.toIntOrNull() ?: 1
     }
 

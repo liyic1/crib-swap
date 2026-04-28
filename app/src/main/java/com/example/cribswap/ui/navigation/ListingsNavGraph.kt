@@ -1,9 +1,9 @@
 package com.example.cribswap.ui.navigation
 
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
+import com.example.cribswap.ui.filter.FilterViewModel
 import com.example.cribswap.ui.listings.*
 
 object ListingRoutes {
@@ -13,14 +13,18 @@ object ListingRoutes {
     const val MY_LISTINGS = "listings/mine"
 }
 
-fun NavGraphBuilder.listingsNavGraph(navController: NavHostController) {
-
+fun NavGraphBuilder.listingsNavGraph(
+    navController: NavHostController,
+    onNavigateToChat: (String, String) -> Unit = { _, _ -> },
+    sharedViewModel: ListingViewModel,
+    filterViewModel: FilterViewModel  // 🔥 NEW: Accept FilterViewModel
+) {
     composable(ListingRoutes.FEED) {
-        val vm: ListingViewModel = viewModel()
         ListingsScreen(
-            viewModel = vm,
+            viewModel = sharedViewModel,
+            filterViewModel = filterViewModel,  // 🔥 NEW: Pass to screen
             onNavigateToDetail = { listing ->
-                vm.selectListing(listing)   // ← set listing BEFORE navigating
+                sharedViewModel.selectListing(listing)
                 navController.navigate(ListingRoutes.DETAIL)
             },
             onNavigateToCreate = {
@@ -30,27 +34,22 @@ fun NavGraphBuilder.listingsNavGraph(navController: NavHostController) {
     }
 
     composable(ListingRoutes.DETAIL) {
-        // Share the SAME ViewModel instance from the back stack
-        val vm: ListingViewModel = navController
-            .getBackStackEntry(ListingRoutes.FEED)
-            .let { viewModel(it) }
-
         ListingDetailScreen(
-            viewModel = vm,
+            viewModel = sharedViewModel,
             onNavigateBack = { navController.popBackStack() },
             onMessageOwner = { ownerId ->
-                // navController.navigate("messaging/$ownerId")
+                val listing = sharedViewModel.selectedListing.value
+                onNavigateToChat(
+                    ownerId,
+                    listing?.ownerName ?: "Seller"
+                )
             }
         )
     }
 
     composable(ListingRoutes.CREATE) {
-        val vm: ListingViewModel = navController
-            .getBackStackEntry(ListingRoutes.FEED)
-            .let { viewModel(it) }
-
         CreateListingScreen(
-            viewModel = vm,
+            viewModel = sharedViewModel,
             onNavigateBack  = { navController.popBackStack() },
             onSubmitSuccess = {
                 navController.popBackStack(ListingRoutes.FEED, inclusive = false)
@@ -59,12 +58,11 @@ fun NavGraphBuilder.listingsNavGraph(navController: NavHostController) {
     }
 
     composable(ListingRoutes.MY_LISTINGS) {
-        val vm: ListingViewModel = viewModel()
         MyListingsScreen(
-            viewModel          = vm,
+            viewModel          = sharedViewModel,
             onNavigateToCreate = { navController.navigate(ListingRoutes.CREATE) },
             onNavigateToDetail = { listing ->
-                vm.selectListing(listing)
+                sharedViewModel.selectListing(listing)
                 navController.navigate(ListingRoutes.DETAIL)
             },
             onNavigateToEdit   = { }

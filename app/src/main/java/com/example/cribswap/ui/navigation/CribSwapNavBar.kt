@@ -6,7 +6,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -18,20 +17,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import com.example.cribswap.ui.Chat
-import com.example.cribswap.ui.Home
 import com.example.cribswap.ui.Saved
+import com.example.cribswap.ui.conversation.MessagesScreen
 import com.example.cribswap.ui.filter.FilterViewModel
+import com.example.cribswap.ui.listings.ListingViewModel
 import com.example.cribswap.ui.screen.PersonalDetailScreen
 import com.example.cribswap.ui.screen.ProfileScreen
 import com.example.cribswap.ui.screen.SettingsScreen
-import com.example.cribswap.ui.conversation.MessagesScreen
 import com.example.cribswap.ui.theme.NavBarBackground
 import com.example.cribswap.ui.theme.NavBarContentSelected
 import com.example.cribswap.ui.theme.NavBarContentUnselected
@@ -39,9 +37,8 @@ import com.example.cribswap.ui.theme.NavBarIndicator
 
 
 private val navItemList = listOf(
-    NavItem("Home", Icons.Default.Home),
-    NavItem("Saved", Icons.Default.Favorite),
     NavItem("Listings", Icons.Default.List),
+    NavItem("Saved", Icons.Default.Favorite),
     NavItem("Chat", Icons.Default.Create),
     NavItem("Profile", Icons.Default.Face)
 )
@@ -51,8 +48,10 @@ fun CribSwapNavBar(
     modifier: Modifier = Modifier,
     filterViewModel: FilterViewModel = viewModel()
 ) {
-    var selectedIndex by remember { mutableIntStateOf(0) }
-    var profileSubScreen by remember { mutableStateOf(ProfileSubScreen.Profile) }
+    var selectedIndex by rememberSaveable { mutableIntStateOf(0) }
+    var profileSubScreen by rememberSaveable { mutableStateOf(ProfileSubScreen.Profile.name) }
+    var pendingMessageUserId by rememberSaveable { mutableStateOf("") }
+    var pendingMessageUserName by rememberSaveable { mutableStateOf("") }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -63,7 +62,7 @@ fun CribSwapNavBar(
                         selected = selectedIndex == index,
                         onClick = {
                             selectedIndex = index
-                            if (index == 4) profileSubScreen = ProfileSubScreen.Profile
+                            if (index == 3) profileSubScreen = ProfileSubScreen.Profile.name
                         },
                         icon = { Icon(imageVector = navItem.icon, contentDescription = navItem.label) },
                         label = { Text(text = navItem.label) },
@@ -79,51 +78,49 @@ fun CribSwapNavBar(
             }
         }
     ) { innerPadding ->
-        ContentScreen(
-            modifier = Modifier.padding(innerPadding),
-            selectedIndex = selectedIndex,
-            filterViewModel = filterViewModel,
-            profileSubScreen = profileSubScreen,
-            onProfileNavigate = { profileSubScreen = it }
-        )
-    }
-}
+        val listingsViewModel: ListingViewModel = viewModel()
 
-@Composable
-private fun ContentScreen(
-    modifier: Modifier = Modifier,
-    selectedIndex: Int,
-    filterViewModel: FilterViewModel,
-    profileSubScreen: ProfileSubScreen,
-    onProfileNavigate: (ProfileSubScreen) -> Unit
-) {
-    when (selectedIndex) {
-        0 -> Home(modifier = modifier, filterViewModel = filterViewModel)
-        1 -> Saved(modifier = modifier)
-        2 -> {
-            // Listings section with its own navigation graph
-            val listingsNavController = rememberNavController()
-            NavHost(
-                navController = listingsNavController,
-                startDestination = ListingRoutes.FEED,
-                modifier = modifier
-            ) {
-                listingsNavGraph(listingsNavController)
+        when (selectedIndex) {
+            0 -> {
+                val listingsNavController = rememberNavController()
+                NavHost(
+                    navController = listingsNavController,
+                    startDestination = ListingRoutes.FEED,
+                    modifier = Modifier.padding(innerPadding)
+                ) {
+                    listingsNavGraph(
+                        navController = listingsNavController,
+                        onNavigateToChat = { userId, userName ->
+                            pendingMessageUserId = userId
+                            pendingMessageUserName = userName
+                            selectedIndex = 2
+                        },
+                        sharedViewModel = listingsViewModel,
+                        filterViewModel = filterViewModel
+                    )
+                }
+            }
+            1 -> Saved(
+                modifier = Modifier.padding(innerPadding),
+                listingViewModel = listingsViewModel
+            )
+            2 -> MessagesScreen(
+                modifier = Modifier.padding(innerPadding),
+                startWithUserId = pendingMessageUserId.ifBlank { null },
+                startWithUserName = pendingMessageUserName.ifBlank { null }
+            )
+            3 -> when (profileSubScreen) {
+                ProfileSubScreen.Profile.name -> ProfileScreen(
+                    onNavigateToSettings = { profileSubScreen = ProfileSubScreen.Settings.name },
+                    onNavigateToPersonalDetail = { profileSubScreen = ProfileSubScreen.PersonalDetail.name }
+                )
+                ProfileSubScreen.Settings.name -> SettingsScreen(
+                    onBack = { profileSubScreen = ProfileSubScreen.Profile.name }
+                )
+                ProfileSubScreen.PersonalDetail.name -> PersonalDetailScreen(
+                    onBack = { profileSubScreen = ProfileSubScreen.Profile.name }
+                )
             }
         }
-        3 -> MessagesScreen(modifier = modifier)
-        4 -> when (profileSubScreen) {
-            ProfileSubScreen.Profile -> ProfileScreen(
-                onNavigateToSettings = { onProfileNavigate(ProfileSubScreen.Settings) },
-                onNavigateToPersonalDetail = { onProfileNavigate(ProfileSubScreen.PersonalDetail) }
-            )
-            ProfileSubScreen.Settings -> SettingsScreen(
-                onBack = { onProfileNavigate(ProfileSubScreen.Profile) }
-            )
-            ProfileSubScreen.PersonalDetail -> PersonalDetailScreen(
-                onBack = { onProfileNavigate(ProfileSubScreen.Profile) }
-            )
-        }
-        else -> Home(modifier = modifier, filterViewModel = filterViewModel)
     }
 }

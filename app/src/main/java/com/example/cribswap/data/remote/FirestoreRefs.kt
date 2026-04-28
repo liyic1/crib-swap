@@ -7,10 +7,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 /**
  * Single source of truth for all Firestore collection paths.
  *
- * USAGE:
- *   val listingsRef = FirestoreRefs.listings()
- *   val userRef = FirestoreRefs.user(userId)
- *
  * Prevents typos and keeps all paths centralized.
  */
 object FirestoreRefs {
@@ -18,7 +14,7 @@ object FirestoreRefs {
     private val db: FirebaseFirestore
         get() = FirebaseFirestore.getInstance()
 
-    // ── Top-level Collections ────────────────────────────────────────────────
+    // ── Top-level Collections ─────────────────────────
 
     fun listings(): CollectionReference =
         db.collection("listings")
@@ -29,7 +25,7 @@ object FirestoreRefs {
     fun conversations(): CollectionReference =
         db.collection("conversations")
 
-    // ── Document References ──────────────────────────────────────────────────
+    // ── Document References ───────────────────────────
 
     fun listing(listingId: String): DocumentReference =
         listings().document(listingId)
@@ -40,7 +36,7 @@ object FirestoreRefs {
     fun conversation(conversationId: String): DocumentReference =
         conversations().document(conversationId)
 
-    // ── Sub-collections ──────────────────────────────────────────────────────
+    // ── Sub-collections ───────────────────────────────
 
     /**
      * Messages inside a specific conversation.
@@ -54,13 +50,20 @@ object FirestoreRefs {
     fun savedListings(userId: String): CollectionReference =
         user(userId).collection("savedListings")
 
-    // ── Backward Compatibility (deprecated, use methods above) ──────────────
+    // ── Compatibility layer (YOUR OLD STYLE) ───────────
 
-    @Deprecated("Use listings() instead", ReplaceWith("listings()"))
+    /**
+     * TEMP: keeps old code working so nothing breaks
+     * Can remove later after refactoring.
+     */
+    @Deprecated("Use conversations() instead")
     fun conversations(db: FirebaseFirestore): CollectionReference =
-        db.collection("conversations")
+        conversations()
 
-    @Deprecated("Use messages(conversationId) instead", ReplaceWith("messages(conversationId)"))
-    fun messages(db: FirebaseFirestore, conversationId: String): CollectionReference =
+    @Deprecated("Use messages(conversationId) instead")
+    fun messages(
+        db: FirebaseFirestore,
+        conversationId: String
+    ): CollectionReference =
         messages(conversationId)
 }
